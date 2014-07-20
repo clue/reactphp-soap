@@ -16,7 +16,7 @@ class ClientEncoder extends SoapClient
         $this->browser = $browser;
     }
 
-    public function __doRequest($request, $location, $action, $version)
+    public function __doRequest($request, $location, $action, $version, $one_way = 0)
     {
         $this->pending = $this->browser->post(
             $location,

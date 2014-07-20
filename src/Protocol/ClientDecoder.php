@@ -28,7 +28,7 @@ class ClientDecoder extends SoapClient
         return $ret;
     }
 
-    public function __doRequest($request, $location, $action, $version)
+    public function __doRequest($request, $location, $action, $version, $one_way = 0)
     {
         // the actual result doesn't actually matter, just return the given result
         // this will be processed internally and will return the parsed result
