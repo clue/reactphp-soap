@@ -74,18 +74,23 @@ class TestCase extends PHPUnit_Framework_TestCase
 
     protected function waitForPromise(PromiseInterface $promise, LoopInterface $loop)
     {
-        $resolved = false;
+        $fulfillment = null;
+        $value = null;
 
         $promise->then(
-            function ($result) use (&$resolved) { $resolved = $result; },
-            function () use (&$resolved) { $resolved = null; }
+            function ($result) use (&$fulfillment, &$value) { $fulfillment = true; $value = $result; },
+            function ($error) use (&$fulfillment, &$value) { $fulfillment = false; $value = $error; }
         );
 
-        while ($resolved === false) {
+        while ($fulfillment === null) {
             $loop->tick();
         }
 
-        return $resolved;
+        if (!$fulfillment) {
+            throw $value;
+        }
+
+        return $value;
     }
 }
 

@@ -43,6 +43,8 @@ class FunctionalTest extends TestCase
         $promise = $api->getBank(array('blz' => 'invalid'));
 
         $this->expectPromiseReject($promise);
+
+        $this->setExpectedException('Exception');
         $this->waitForPromise($promise, $this->loop);
     }
 
@@ -53,6 +55,8 @@ class FunctionalTest extends TestCase
         $promise = $api->doesNotexist();
 
         $this->expectPromiseReject($promise);
+
+        $this->setExpectedException('Exception');
         $this->waitForPromise($promise, $this->loop);
     }
 }
