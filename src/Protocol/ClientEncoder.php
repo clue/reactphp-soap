@@ -26,13 +26,13 @@ class ClientEncoder extends SoapClient
     {
         $this->request = new Request(
             'POST',
-            $location,
+            (string)$location,
             new Headers(array(
-                'SOAPAction' => $action,
+                'SOAPAction' => (string)$action,
                 'Content-Type' => 'text/xml; charset=utf-8',
                 'Content-Length' => strlen($request)
             )),
-            new Body($request)
+            new Body((string)$request)
         );
 
         // do not actually block here, just pretend we're done...
