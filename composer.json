@@ -1,0 +1,21 @@
+{
+    "name": "clue/soap-react",
+    "description": "Simple, async SOAP webservice client library",
+    "keywords": ["SOAP", "WebService", "WSDL", "React"],
+    "homepage": "https://github.com/clue/php-soap-react",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christian Lück",
+            "email": "christian@lueck.tv"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "Clue\\React\\Soap\\": "src/" }
+    },
+    "require": {
+        "php": ">=5.3",
+        "clue/buzz-react": "0.1.*",
+        "ext-soap": "*"
+    }
+}
