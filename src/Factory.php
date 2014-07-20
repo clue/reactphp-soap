@@ -24,10 +24,10 @@ class Factory
     {
         $browser = $this->browser;
 
-        return $this->browser->get($wsdl)->then(function (Response $response) {
+        return $this->browser->get($wsdl)->then(function (Response $response) use ($browser) {
             $url = 'data://text/plain;base64,' . base64_encode((string)$response->getBody());
 
-            return new Client($url, $this->browser);
+            return new Client($url, $browser);
         });
     }
 }
