@@ -4,28 +4,35 @@ namespace Clue\React\Soap\Protocol;
 
 use Clue\React\Buzz\Browser;
 use \SoapClient;
+use Clue\React\Buzz\Message\Request;
+use Clue\React\Buzz\Message\Headers;
+use Clue\React\Buzz\Message\Body;
 
 class ClientEncoder extends SoapClient
 {
-    private $browser;
-    public $pending = null;
+    private $request = null;
 
-    public function __construct($wsdl, Browser $browser)
+    public function encode($name, $args)
     {
-        parent::__construct($wsdl);
-        $this->browser = $browser;
+        $this->__soapCall($name, $args);
+
+        $request = $this->request;
+        $this->request = null;
+
+        return $request;
     }
 
     public function __doRequest($request, $location, $action, $version, $one_way = 0)
     {
-        $this->pending = $this->browser->post(
+        $this->request = new Request(
+            'POST',
             $location,
-            array(
+            new Headers(array(
                 'SOAPAction' => $action,
                 'Content-Type' => 'text/xml; charset=utf-8',
                 'Content-Length' => strlen($request)
-            ),
-            $request
+            )),
+            new Body($request)
         );
 
         // do not actually block here, just pretend we're done...

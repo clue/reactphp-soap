@@ -20,7 +20,7 @@ class Client
     public function __construct($wsdl, Browser $browser, ClientEncoder $encoder = null, ClientDecoder $decoder = null)
     {
         if ($encoder === null) {
-            $encoder = new ClientEncoder($wsdl, $browser);
+            $encoder = new ClientEncoder($wsdl);
         }
 
         if ($decoder === null) {
@@ -36,17 +36,14 @@ class Client
     public function soapCall($name, $args)
     {
         try {
-            $this->encoder->__soapCall($name, $args);
+            $request = $this->encoder->encode($name, $args);
         } catch (\Exception $e) {
             $deferred = new Deferred();
             $deferred->reject($e);
             return $deferred->promise();
         }
 
-        $promise = $this->encoder->pending;
-        $this->encoder->pending = null;
-
-        return $promise->then(
+        return $this->browser->send($request)->then(
             array($this, 'handleResponse'),
             array($this, 'handleError')
         );
