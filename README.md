@@ -2,7 +2,7 @@
 
 Simple, async SOAP webservice client library
 
-> Note: This project is in early alpha stage! Feel free to report any issues you encounter.
+> Note: This project is in beta stage! Feel free to report any issues you encounter.
 
 ## Quickstart example
 
@@ -69,12 +69,10 @@ The recommended way to install this library is [through composer](packagist://ge
 ```JSON
 {
     "require": {
-        "clue/soap-react": "dev-master"
+        "clue/soap-react": "~0.1.0"
     }
 }
 ```
-
-> Note: This project is currently not listed on packagist
 
 ## License
 
