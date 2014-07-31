@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "cfb63547653ae22b70626ca7570f5e81",
+    "hash": "e2f8e14a4d68651649065af1f9cabe00",
     "packages": [
         {
             "name": "clue/buzz-react",
