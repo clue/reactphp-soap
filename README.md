@@ -1,6 +1,32 @@
 # clue/soap-react [![Build Status](https://travis-ci.org/clue/php-soap-react.svg?branch=master)](https://travis-ci.org/clue/php-soap-react)
 
-Simple, async SOAP webservice client library
+A simple, async [SOAP](http://en.wikipedia.org/wiki/SOAP) web service client library
+
+Most notably, SOAP is often used for invoking
+[Remote procedure calls](http://en.wikipedia.org/wiki/Remote_procedure_call) (RPCs)
+in distributed systems.
+Internally, SOAP messages are encoded as XML and usually sent via HTTP POST requests.
+For the most part, SOAP (originally *Simple Object Access protocol*) is a protocol of the past,
+and in fact anything but *simple*.
+It is still in use by many (often *legacy*) systems.
+
+This project provides a *simple* API for invoking *async* RPCs to remote web services.
+
+* **Async execution of functions** -
+  Send any number of functions (RPCs) to the remote web service in parallel and
+  process their responses as soon as results come in.
+  The Promise-based design provides a *sane* interface to working with out of bound responses.
+* **Async processing of the WSDL** -
+  The WSDL (web service description language) file will be downloaded and processed
+  in the background.
+* **Event-driven core** -
+  Internally, everything uses event handlers to react to incoming events, such as an incoming RPC result.
+* **Lightweight, SOLID design** -
+  Provides a thin abstraction that is [*just good enough*](http://en.wikipedia.org/wiki/Principle_of_good_enough)
+  and does not get in your way.
+  Built on top of tested components instead of re-inventing the wheel.
+* **Good test coverage** -
+  Comes with an automated tests suite and is regularly tested against actual web services in the wild
 
 > Note: This project is in beta stage! Feel free to report any issues you encounter.
 
@@ -33,7 +59,7 @@ the `Client` instance.
 
 ### Client
 
-The `Client` class is responsible for communication with the remove SOAP
+The `Client` class is responsible for communication with the remote SOAP
 WebService server.
 
 > Note: It's recommended (and easier) to wrap the `Client` in a `Proxy` instance
