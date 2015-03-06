@@ -1,6 +1,6 @@
 # clue/soap-react [![Build Status](https://travis-ci.org/clue/php-soap-react.svg?branch=master)](https://travis-ci.org/clue/php-soap-react)
 
-A simple, async [SOAP](http://en.wikipedia.org/wiki/SOAP) web service client library
+A simple, async [SOAP](http://en.wikipedia.org/wiki/SOAP) web service client library, built on top of [React PHP](http://reactphp.org/).
 
 Most notably, SOAP is often used for invoking
 [Remote procedure calls](http://en.wikipedia.org/wiki/Remote_procedure_call) (RPCs)
@@ -36,6 +36,7 @@ Once [installed](#install), you can use the following code to query an example
 web service via SOAP:
 
 ```php
+$loop = React\EventLoop\Factory::create();
 $factory = new Factory($loop);
 $wsdl = 'http://example.com/demo.wsdl';
 
@@ -46,6 +47,8 @@ $factory->createClient($wsdl)->then(function (Client $client) {
         var_dump('Result', $result);
     });
 });
+
+$loop->run();
 ```
 
 See also the [examples](examples).
@@ -56,6 +59,20 @@ See also the [examples](examples).
 
 The `Factory` class is responsible for fetching the WSDL file once and constructing
 the `Client` instance.
+It also registers everything with the main [`EventLoop`](https://github.com/reactphp/event-loop#usage).
+
+```php
+$loop = React\EventLoop\Factory::create();
+$factory = new Factory($loop);
+```
+
+If you need custom DNS or proxy settings, you can explicitly pass a
+custom [`Browser`](https://github.com/clue/php-buzz-react#browser) instance:
+
+```php
+$browser = new Clue\React\Buzz\Browser($loop);
+$factory = new Factory($loop, $browser);
+```
 
 ### Client
 
@@ -69,8 +86,11 @@ The `soapCall($method, $arguments)` method can be used to queue the given
 function to be sent via SOAP and wait for a response from the remote web service.
 
 The `getFunctions()` method returns an array of functions defined in the WSDL.
+It returns the equivalent of PHP's [`SoapClient::__getFunctions()`](http://php.net/manual/en/soapclient.getfunctions.php).
 
 The `getTypes()` method returns an array of types defined in the WSDL.
+It returns the equivalent of PHP's [`SoapClient::__getTypes()`](http://php.net/manual/en/soapclient.gettypes.php).
+
 
 ### Proxy
 
