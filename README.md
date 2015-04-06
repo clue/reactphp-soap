@@ -58,7 +58,7 @@ See also the [examples](examples).
 ### Factory
 
 The `Factory` class is responsible for fetching the WSDL file once and constructing
-the `Client` instance.
+the [`Client`](#client) instance.
 It also registers everything with the main [`EventLoop`](https://github.com/reactphp/event-loop#usage).
 
 ```php
@@ -74,38 +74,86 @@ $browser = new Clue\React\Buzz\Browser($loop);
 $factory = new Factory($loop, $browser);
 ```
 
+#### createClient()
+
+The `createClient($wsdl)` method can be used to download the WSDL at the
+given URL into memory and create a new [`Client`](#client).
+
+```php
+$factory->createClient($url)->then(
+    function (Client $client) {
+        // client ready
+    },
+    function (Exception $e) {
+        // an error occured while trying to download the WSDL
+    }
+);
+```
+
 ### Client
 
 The `Client` class is responsible for communication with the remote SOAP
 WebService server.
 
-> Note: It's recommended (and easier) to wrap the `Client` in a `Proxy` instance
-> (see below). The rest of this chapter is considered advanced usage.
+If you want to call RPC functions, see below for the [`Proxy`](#proxy) class.
+
+Note: It's recommended (and easier) to wrap the `Client` in a [`Proxy`](#proxy) instance.
+All public methods of the `Client` are considered *advanced usage*.
+
+#### soapCall()
 
 The `soapCall($method, $arguments)` method can be used to queue the given
 function to be sent via SOAP and wait for a response from the remote web service.
 
+#### getFunctions()
+
 The `getFunctions()` method returns an array of functions defined in the WSDL.
 It returns the equivalent of PHP's [`SoapClient::__getFunctions()`](http://php.net/manual/en/soapclient.getfunctions.php).
+
+#### getTypes()
 
 The `getTypes()` method returns an array of types defined in the WSDL.
 It returns the equivalent of PHP's [`SoapClient::__getTypes()`](http://php.net/manual/en/soapclient.gettypes.php).
 
-
 ### Proxy
 
-The `Proxy` class wraps an existing `Client` instance in order to ease calling
+The `Proxy` class wraps an existing [`Client`](#client) instance in order to ease calling
 SOAP functions.
 
 ```php
 $proxy = new Proxy($client);
+```
 
+#### Functions
+
+Each and every method call to the `Proxy` class will be sent via SOAP.
+
+```php
 $proxy->myMethod($myArg1, $myArg2)->then(function ($response) {
     // result received
 });
 ```
 
-Each and every method call will be forwarded to `Client::soapCall()`.
+Please refer to your WSDL or its accompanying documentation for details
+on which functions and arguments are supported.
+
+#### Processing
+
+Issuing SOAP functions is async (non-blocking), so you can actually send multiple RPC requests in parallel.
+The web service will respond to each request with a return value. The order is not guaranteed.
+Sending requests uses a [Promise](https://github.com/reactphp/promise)-based interface that makes it easy to react to when a request is *fulfilled*
+(i.e. either successfully resolved or rejected with an error):
+
+```php
+$proxy->demo()->then(
+    function ($response) {
+        // response received for demo function
+    },
+    function (Exception $e) {
+        // an error occured while executing the request
+    }
+});
+```
 
 ## Install
 
