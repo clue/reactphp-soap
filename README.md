@@ -105,6 +105,8 @@ All public methods of the `Client` are considered *advanced usage*.
 The `soapCall($method, $arguments)` method can be used to queue the given
 function to be sent via SOAP and wait for a response from the remote web service.
 
+Note: This is considered *advanced usage*, you may want to look into using the [`Proxy`](#proxy) instead.
+
 #### getFunctions()
 
 The `getFunctions()` method returns an array of functions defined in the WSDL.
@@ -157,8 +159,8 @@ $proxy->demo()->then(
 
 ## Install
 
-The recommended way to install this library is [through composer](packagist://getcomposer.org).
-[New to composer?](packagist://getcomposer.org/doc/00-intro.md)
+The recommended way to install this library is [through composer](http://getcomposer.org).
+[New to composer?](http://getcomposer.org/doc/00-intro.md)
 
 ```JSON
 {
