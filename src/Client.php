@@ -103,10 +103,15 @@ class Client
         return (string)$this->encoder->encode($function, array())->getUri();
     }
 
-    public function overrideLocation($location)
+    public function overrideTarget($target)
     {
         $copy = clone $this;
-        $copy->encoder = $this->encoder->overrideLocation($location);
+        $copy->encoder = $this->encoder->overrideTarget($target);
         return $copy;
+    }
+
+    public function getWsdlTarget()
+    {
+        return $this->encoder->getWsdlTarget();
     }
 }
