@@ -69,10 +69,10 @@ class Client
         return $this->encoder->__getTypes();
     }
 
-    public function withOverridenTarget($target)
+    public function withTarget($target)
     {
         $copy = clone $this;
-        $copy->encoder = $this->encoder->withOverridenTarget($target);
+        $copy->encoder = $this->encoder->withTarget($target);
         return $copy;
     }
 
