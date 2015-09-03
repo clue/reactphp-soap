@@ -71,7 +71,7 @@ class ClientEncoder extends SoapClient
         );
 
         $this->findTarget = true;
-        $this->__soapCall($function, []);
+        $this->__soapCall($function, array());
         return $this->target;
     }
 
