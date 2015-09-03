@@ -7,7 +7,8 @@ use RingCentral\Psr7\Request;
 
 class ClientEncoder extends SoapClient
 {
-    private $request = null;
+    private $request          = null;
+    private $locationOverride = null;
 
     public function encode($name, $args)
     {
@@ -21,9 +22,11 @@ class ClientEncoder extends SoapClient
 
     public function __doRequest($request, $location, $action, $version, $one_way = 0)
     {
+        $finalLocation = $this->locationOverride !== null ? $this->locationOverride : $location;
+
         $this->request = new Request(
             'POST',
-            (string)$location,
+            (string)$finalLocation,
             array(
                 'SOAPAction' => (string)$action,
                 'Content-Type' => 'text/xml; charset=utf-8',
@@ -34,5 +37,12 @@ class ClientEncoder extends SoapClient
 
         // do not actually block here, just pretend we're done...
         return '';
+    }
+
+    public function overrideLocation($newLocation)
+    {
+        $copy = clone $this;
+        $this->locationOverride = $newLocation;
+        return $copy;
     }
 }

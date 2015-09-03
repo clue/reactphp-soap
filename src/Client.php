@@ -102,4 +102,11 @@ class Client
         // encode request for given $function
         return (string)$this->encoder->encode($function, array())->getUri();
     }
+
+    public function overrideLocation($location)
+    {
+        $copy = clone $this;
+        $copy->encoder = $this->encoder->overrideLocation($location);
+        return $copy;
+    }
 }
