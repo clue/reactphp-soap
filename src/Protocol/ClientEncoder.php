@@ -28,7 +28,7 @@ class ClientEncoder extends SoapClient
     public function __doRequest($request, $location, $action, $version, $one_way = 0)
     {
         if ($this->findTarget) {
-            $this->target     = $location;
+            $this->target     = (string) $location;
             $this->findTarget = false;
         } else {
             $finalLocation = $this->targetOverride !== null ? $this->targetOverride : $location;
@@ -73,7 +73,7 @@ class ClientEncoder extends SoapClient
         );
 
         $this->findTarget = true;
-        $this->__soapCall($function, array());
+        $this->__soapCall($function, []);
         return $this->target;
     }
 
