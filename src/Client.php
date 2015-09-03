@@ -103,10 +103,10 @@ class Client
         return (string)$this->encoder->encode($function, array())->getUri();
     }
 
-    public function withOverridenTarget($target)
+    public function withTarget($target)
     {
         $copy = clone $this;
-        $copy->encoder = $this->encoder->withOverridenTarget($target);
+        $copy->encoder = $this->encoder->withTarget($target);
         return $copy;
     }
 
