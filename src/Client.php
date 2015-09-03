@@ -69,10 +69,15 @@ class Client
         return $this->encoder->__getTypes();
     }
 
-    public function overrideLocation($location)
+    public function overrideTarget($target)
     {
         $copy = clone $this;
-        $copy->encoder = $this->encoder->overrideLocation($location);
+        $copy->encoder = $this->encoder->overrideTarget($target);
         return $copy;
+    }
+
+    public function getWsdlTarget()
+    {
+        return $this->encoder->getWsdlTarget();
     }
 }

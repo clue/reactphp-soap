@@ -117,6 +117,14 @@ It returns the equivalent of PHP's [`SoapClient::__getFunctions()`](http://php.n
 The `getTypes()` method returns an array of types defined in the WSDL.
 It returns the equivalent of PHP's [`SoapClient::__getTypes()`](http://php.net/manual/en/soapclient.gettypes.php).
 
+#### overrideTarget($newTarget)
+
+This method allows you to change the destination of your SOAP calls.
+
+#### getWsdlTarget()
+
+This method allows you to retrieve the target URL specified in the WSDL file.
+
 ### Proxy
 
 The `Proxy` class wraps an existing [`Client`](#client) instance in order to ease calling
