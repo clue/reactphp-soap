@@ -68,4 +68,11 @@ class Client
     {
         return $this->encoder->__getTypes();
     }
+
+    public function overrideLocation($location)
+    {
+        $copy = clone $this;
+        $copy->encoder = $this->encoder->overrideLocation($location);
+        return $copy;
+    }
 }
