@@ -68,4 +68,12 @@ class Client
     {
         return $this->encoder->__getTypes();
     }
+
+    public function getLocation()
+    {
+        $original = $this->encoder->__setLocation('http://dummy.invalid/');
+        $this->encoder->__setLocation($original);
+
+        return $original;
+    }
 }

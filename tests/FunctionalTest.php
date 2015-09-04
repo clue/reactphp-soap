@@ -7,7 +7,14 @@ use Clue\React\Block;
 
 class FunctionalTest extends TestCase
 {
+    /**
+     * @var React\EventLoop\LoopInterface
+     */
     private $loop;
+
+    /**
+     * @var Client
+     */
     private $client;
 
     public function setUp()
@@ -59,5 +66,11 @@ class FunctionalTest extends TestCase
 
         $this->setExpectedException('Exception');
         Block\await($promise, $this->loop);
+    }
+
+    public function testGetLocation()
+    {
+        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation());
+        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation());
     }
 }
