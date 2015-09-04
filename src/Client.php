@@ -69,9 +69,9 @@ class Client
         return $this->encoder->__getTypes();
     }
 
-    public function getLocation()
+    public function getLocation($function)
     {
-        // TODO: requires a valid method name…
-        return $this->encoder->encode('getBank', array())->getUrl();
+        // encode request for given $function
+        return (string)$this->encoder->encode($function, array())->getUri();
     }
 }

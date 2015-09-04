@@ -117,6 +117,22 @@ It returns the equivalent of PHP's [`SoapClient::__getFunctions()`](http://php.n
 The `getTypes()` method returns an array of types defined in the WSDL.
 It returns the equivalent of PHP's [`SoapClient::__getTypes()`](http://php.net/manual/en/soapclient.gettypes.php).
 
+#### getLocation()
+
+The `getLocation($function)` method can be used to return the location (URI)
+of the given webservice `$function`.
+
+Note that this is not to be confused with the WSDL file location.
+A WSDL file can contain any number of function definitions.
+It's very common that all of these functions use the same location definition.
+However, technically each function can potentially use a different location.
+
+```php
+assert('http://example.com/soap/service' == $client->getLocation('echo'));
+```
+
+Passing a `$function` not defined in the WSDL file will throw a `SoapFault`. 
+
 ### Proxy
 
 The `Proxy` class wraps an existing [`Client`](#client) instance in order to ease calling

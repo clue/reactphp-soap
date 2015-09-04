@@ -70,7 +70,15 @@ class FunctionalTest extends TestCase
 
     public function testGetLocation()
     {
-        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation());
-        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation());
+        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation('getBank'));
+        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation('getBank'));
+    }
+
+    /**
+     * @expectedException SoapFault
+     */
+    public function testGetLocationOfUnknownFunctionFails()
+    {
+        $this->client->getLocation('unknown');
     }
 }
