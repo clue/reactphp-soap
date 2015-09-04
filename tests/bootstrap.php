@@ -2,6 +2,7 @@
 
 use React\Promise\PromiseInterface;
 use React\EventLoop\LoopInterface;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 class TestCase extends PHPUnit_Framework_TestCase
@@ -70,27 +71,6 @@ class TestCase extends PHPUnit_Framework_TestCase
         $promise->then($this->expectCallableNever(), $this->expectCallableOnce());
 
         return $promise;
-    }
-
-    protected function waitForPromise(PromiseInterface $promise, LoopInterface $loop)
-    {
-        $fulfillment = null;
-        $value = null;
-
-        $promise->then(
-            function ($result) use (&$fulfillment, &$value) { $fulfillment = true; $value = $result; },
-            function ($error) use (&$fulfillment, &$value) { $fulfillment = false; $value = $error; }
-        );
-
-        while ($fulfillment === null) {
-            $loop->tick();
-        }
-
-        if (!$fulfillment) {
-            throw $value;
-        }
-
-        return $value;
     }
 }
 
