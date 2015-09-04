@@ -59,4 +59,32 @@ class FunctionalTest extends TestCase
         $this->setExpectedException('Exception');
         $this->waitForPromise($promise, $this->loop);
     }
+
+    public function testWrongLocationOverride()
+    {
+        $this->client->withTarget('nonsense.not.existing');
+        $api = new Proxy($this->client);
+
+        $promise = $api->getBank(array('blz' => '12070000'));
+
+        $this->expectPromiseReject($promise);
+
+        $this->setExpectedException('Exception');
+        $this->waitForPromise($promise, $this->loop);
+    }
+
+    public function testCorrectLocationOverride()
+    {
+        $this->client->withTarget('nonsense.not.existing');
+        $this->client->withTarget('http://www.thomas-bayer.com/axis2/services/BLZService');
+        $this->testBlzService();
+    }
+
+    public function testGetLocation()
+    {
+        $this->assertEquals(
+            $this->client->getWsdlTarget(),
+            'http://www.thomas-bayer.com/axis2/services/BLZService'
+        );
+    }
 }

@@ -68,4 +68,16 @@ class Client
     {
         return $this->encoder->__getTypes();
     }
+
+    public function withTarget($target)
+    {
+        $copy = clone $this;
+        $copy->encoder = $this->encoder->withTarget($target);
+        return $copy;
+    }
+
+    public function getWsdlTarget()
+    {
+        return $this->encoder->getWsdlTarget();
+    }
 }
