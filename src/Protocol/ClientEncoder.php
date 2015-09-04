@@ -50,7 +50,7 @@ class ClientEncoder extends SoapClient
     public function withTarget($newTarget)
     {
         $copy = clone $this;
-        $this->targetOverride = $newTarget;
+        $copy->targetOverride = $newTarget;
         return $copy;
     }
 
