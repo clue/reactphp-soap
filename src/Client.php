@@ -16,6 +16,7 @@ class Client
     private $browser;
     private $encoder;
     private $decoder;
+    private $rawResponses;
 
     public function __construct($wsdl, Browser $browser, ClientEncoder $encoder = null, ClientDecoder $decoder = null)
     {
@@ -31,6 +32,7 @@ class Client
         $this->browser = $browser;
         $this->encoder = $encoder;
         $this->decoder = $decoder;
+        $this->rawResponses = true;
     }
 
     public function soapCall($name, $args)
@@ -51,7 +53,11 @@ class Client
 
     public function handleResponse(Response $response)
     {
-        return $this->decoder->decode((string)$response->getBody());
+        if ($this->rawResponses) {
+            return $response;
+        } else {
+            return $this->decoder->decode((string)$response->getBody());
+        }
     }
 
     public function handleError(Exception $error)
@@ -67,5 +73,12 @@ class Client
     public function getTypes()
     {
         return $this->encoder->__getTypes();
+    }
+
+    public function returningRawResponses()
+    {
+        $copy = clone $this;
+        $copy->rawResponses = true;
+        return $copy;
     }
 }
