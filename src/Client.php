@@ -32,7 +32,7 @@ class Client
         $this->browser = $browser;
         $this->encoder = $encoder;
         $this->decoder = $decoder;
-        $this->rawResponses = true;
+        $this->rawResponses = false;
     }
 
     public function soapCall($name, $args)
