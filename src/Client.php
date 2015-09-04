@@ -71,9 +71,7 @@ class Client
 
     public function getLocation()
     {
-        $original = $this->encoder->__setLocation('http://dummy.invalid/');
-        $this->encoder->__setLocation($original);
-
-        return $original;
+        // TODO: requires a valid method name…
+        return $this->encoder->encode('getBank', array())->getUrl();
     }
 }
