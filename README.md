@@ -90,6 +90,10 @@ $factory->createClient($url)->then(
 );
 ```
 
+#### createClientFromWsdl($wsdlContents)
+
+Same as createClient(), but leaves you the responsibility to load the WSDL file. This allows you to use local WSDL files, for instance.
+
 ### Client
 
 The `Client` class is responsible for communication with the remote SOAP
