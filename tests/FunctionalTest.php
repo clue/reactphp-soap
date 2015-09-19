@@ -45,7 +45,7 @@ class FunctionalTest extends TestCase
         $this->expectPromiseResolve($promise);
         $result = $this->waitForPromise($promise, $this->loop);
 
-        $this->assertInstanceof('\Clue\React\Buzz\Message\Response', $result);
+        $this->assertTrue(is_string($result));
     }
 
     public function testBlzServiceWithInvalidBlz()

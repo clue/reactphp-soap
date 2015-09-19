@@ -54,9 +54,9 @@ class Client
     public function handleResponse(Response $response)
     {
         if ($this->rawResponses) {
-            return $response;
+            return (string) $response->getBody();
         } else {
-            return $this->decoder->decode((string)$response->getBody());
+            return $this->decoder->decode((string) $response->getBody());
         }
     }
 
