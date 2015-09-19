@@ -51,7 +51,7 @@ class Client
 
     public function handleResponse(Response $response)
     {
-        return $this->decoder->decode((string)$response->getBody());
+        return $this->decoder->decode((string) $response->getBody());
     }
 
     public function handleError(Exception $error)
@@ -74,10 +74,5 @@ class Client
         $copy = clone $this;
         $copy->encoder = $this->encoder->withTarget($target);
         return $copy;
-    }
-
-    public function getWsdlTarget()
-    {
-        return $this->encoder->getWsdlTarget();
     }
 }
