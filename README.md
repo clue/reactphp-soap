@@ -171,10 +171,6 @@ Passing a `$function` not defined in the WSDL file will throw a `SoapFault`.
 This method allows you to change the destination of your SOAP calls. It does not change the Client object, but returns a new
 Client with the overriden target.
 
-#### getWsdlTarget()
-
-This method allows you to retrieve the target URL specified in the WSDL file.
-
 ### Proxy
 
 The `Proxy` class wraps an existing [`Client`](#client) instance in order to ease calling

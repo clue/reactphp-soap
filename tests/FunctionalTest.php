@@ -91,8 +91,7 @@ class FunctionalTest extends PHPUnit_Framework_TestCase
 
     public function testWrongLocationOverride()
     {
-        $this->client->withTarget('nonsense.not.existing');
-        $api = new Proxy($this->client);
+        $api = new Proxy($this->client->withTarget('nonsense.not.existing'));
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
@@ -107,13 +106,5 @@ class FunctionalTest extends PHPUnit_Framework_TestCase
         $this->client->withTarget('nonsense.not.existing');
         $this->client->withTarget('http://www.thomas-bayer.com/axis2/services/BLZService');
         $this->testBlzService();
-    }
-
-    public function testGetLocation()
-    {
-        $this->assertEquals(
-            $this->client->getWsdlTarget(),
-            'http://www.thomas-bayer.com/axis2/services/BLZService'
-        );
     }
 }
