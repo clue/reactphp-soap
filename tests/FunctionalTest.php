@@ -37,6 +37,18 @@ class FunctionalTest extends TestCase
         $this->assertInternalType('object', $result);
     }
 
+    public function testRawResponses()
+    {
+        $api = new Proxy($this->client->returningRawResponses());
+
+        $promise = $api->getBank(array('blz' => '12070000'));
+
+        $this->expectPromiseResolve($promise);
+        $result = $this->waitForPromise($promise, $this->loop);
+
+        $this->assertTrue(is_string($result));
+    }
+
     public function testBlzServiceWithInvalidBlz()
     {
         $api = new Proxy($this->client);

@@ -117,6 +117,11 @@ It returns the equivalent of PHP's [`SoapClient::__getFunctions()`](http://php.n
 The `getTypes()` method returns an array of types defined in the WSDL.
 It returns the equivalent of PHP's [`SoapClient::__getTypes()`](http://php.net/manual/en/soapclient.gettypes.php).
 
+#### returningRawResponses()
+
+Returns a new Client instance that returns raw response XML instead of responses parsed by the SoapClient class.
+Use this when you want to parse the response XML yourself.
+
 ### Proxy
 
 The `Proxy` class wraps an existing [`Client`](#client) instance in order to ease calling
