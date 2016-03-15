@@ -68,17 +68,30 @@ class FunctionalTest extends TestCase
         Block\await($promise, $this->loop);
     }
 
-    public function testGetLocation()
+    public function testGetLocationForFunctionName()
     {
         $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation('getBank'));
         $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation('getBank'));
     }
 
+    public function testGetLocationForFunctionNumber()
+    {
+        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation(0));
+    }
+
     /**
      * @expectedException SoapFault
      */
-    public function testGetLocationOfUnknownFunctionFails()
+    public function testGetLocationOfUnknownFunctionNameFails()
     {
         $this->client->getLocation('unknown');
+    }
+
+    /**
+     * @expectedException SoapFault
+     */
+    public function testGetLocationForUnknownFunctionNumberFails()
+    {
+        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation(100));
     }
 }
