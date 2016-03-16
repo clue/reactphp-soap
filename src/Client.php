@@ -51,7 +51,7 @@ class Client
 
     public function handleResponse(Response $response)
     {
-        return $this->decoder->decode((string)$response->getBody());
+        return $this->decoder->decode((string) $response->getBody());
     }
 
     public function handleError(Exception $error)
