@@ -104,7 +104,7 @@ class FunctionalTest extends TestCase
         $this->expectPromiseReject($promise);
 
         $this->setExpectedException('Exception');
-        $this->waitForPromise($promise, $this->loop);
+        Block\await($promise, $this->loop);
     }
 
     public function testCorrectLocationOverride()
