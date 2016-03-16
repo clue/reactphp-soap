@@ -94,4 +94,23 @@ class FunctionalTest extends TestCase
     {
         $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation(100));
     }
+
+    public function testWrongLocationOverride()
+    {
+        $api = new Proxy($this->client->withTarget('nonsense.not.existing'));
+
+        $promise = $api->getBank(array('blz' => '12070000'));
+
+        $this->expectPromiseReject($promise);
+
+        $this->setExpectedException('Exception');
+        Block\await($promise, $this->loop);
+    }
+
+    public function testCorrectLocationOverride()
+    {
+        $this->client->withTarget('nonsense.not.existing');
+        $this->client->withTarget('http://www.thomas-bayer.com/axis2/services/BLZService');
+        $this->testBlzService();
+    }
 }
