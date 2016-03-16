@@ -98,7 +98,7 @@ class FunctionalTest extends PHPUnit_Framework_TestCase
         $this->expectPromiseReject($promise);
 
         $this->setExpectedException('Exception');
-        $this->waitForPromise($promise, $this->loop);
+        Block\await($promise, $this->loop);
     }
 
     public function testCorrectLocationOverride()
