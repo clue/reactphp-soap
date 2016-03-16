@@ -22,12 +22,18 @@ class Factory
 
     public function createClient($wsdl)
     {
-        $browser = $this->browser;
+        $that = $this;
 
-        return $this->browser->get($wsdl)->then(function (Response $response) use ($browser) {
-            $url = 'data://text/plain;base64,' . base64_encode((string)$response->getBody());
-
-            return new Client($url, $browser);
+        return $this->browser->get($wsdl)->then(function (Response $response) use ($that) {
+            return $that->createClientFromWsdl($response->getBody());
         });
+    }
+
+    public function createClientFromWsdl($wsdlContents)
+    {
+        $browser = $this->browser;
+        $url     = 'data://text/plain;base64,' . base64_encode((string)$wsdlContents);
+
+        return new Client($url, $browser);
     }
 }

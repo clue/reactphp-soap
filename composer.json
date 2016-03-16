@@ -15,9 +15,12 @@
     },
     "require": {
         "php": ">=5.3",
-        "clue/buzz-react": "0.1.*",
+        "clue/buzz-react": "0.4.*",
         "react/event-loop": "0.3.*|0.4.*",
         "react/promise": "~1.0|~2.0",
         "ext-soap": "*"
+    },
+    "require-dev": {
+        "clue/block-react": "~0.3.0"
     }
 }

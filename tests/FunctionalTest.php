@@ -3,10 +3,18 @@
 use Clue\React\Soap\Factory;
 use Clue\React\Soap\Client;
 use Clue\React\Soap\Proxy;
+use Clue\React\Block;
 
 class FunctionalTest extends TestCase
 {
+    /**
+     * @var React\EventLoop\LoopInterface
+     */
     private $loop;
+
+    /**
+     * @var Client
+     */
     private $client;
 
     public function setUp()
@@ -17,7 +25,7 @@ class FunctionalTest extends TestCase
         $promise = $factory->createClient('http://www.thomas-bayer.com/axis2/services/BLZService?wsdl');
 
         $this->expectPromiseResolve($promise);
-        $this->client = $this->waitForPromise($promise, $this->loop);
+        $this->client = Block\await($promise, $this->loop);
         /* @var $client Client */
     }
 
@@ -31,7 +39,7 @@ class FunctionalTest extends TestCase
         $promise = $api->getBank(array('blz' => '12070000'));
 
         $this->expectPromiseResolve($promise);
-        $result = $this->waitForPromise($promise, $this->loop);
+        $result = Block\await($promise, $this->loop);
 
         $this->assertInternalType('object', $result);
     }
@@ -45,7 +53,7 @@ class FunctionalTest extends TestCase
         $this->expectPromiseReject($promise);
 
         $this->setExpectedException('Exception');
-        $this->waitForPromise($promise, $this->loop);
+        Block\await($promise, $this->loop);
     }
 
     public function testBlzServiceWithInvalidMethod()
@@ -57,7 +65,34 @@ class FunctionalTest extends TestCase
         $this->expectPromiseReject($promise);
 
         $this->setExpectedException('Exception');
-        $this->waitForPromise($promise, $this->loop);
+        Block\await($promise, $this->loop);
+    }
+
+    public function testGetLocationForFunctionName()
+    {
+        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation('getBank'));
+        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation('getBank'));
+    }
+
+    public function testGetLocationForFunctionNumber()
+    {
+        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation(0));
+    }
+
+    /**
+     * @expectedException SoapFault
+     */
+    public function testGetLocationOfUnknownFunctionNameFails()
+    {
+        $this->client->getLocation('unknown');
+    }
+
+    /**
+     * @expectedException SoapFault
+     */
+    public function testGetLocationForUnknownFunctionNumberFails()
+    {
+        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation(100));
     }
 
     public function testWrongLocationOverride()
