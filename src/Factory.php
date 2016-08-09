@@ -4,7 +4,7 @@ namespace Clue\React\Soap;
 
 use React\EventLoop\LoopInterface;
 use Clue\React\Buzz\Browser;
-use Clue\React\Buzz\Message\Response;
+use Psr\Http\Message\ResponseInterface;
 
 class Factory
 {
@@ -24,15 +24,15 @@ class Factory
     {
         $that = $this;
 
-        return $this->browser->get($wsdl)->then(function (Response $response) use ($that) {
-            return $that->createClientFromWsdl($response->getBody());
+        return $this->browser->get($wsdl)->then(function (ResponseInterface $response) use ($that) {
+            return $that->createClientFromWsdl((string)$response->getBody());
         });
     }
 
     public function createClientFromWsdl($wsdlContents)
     {
         $browser = $this->browser;
-        $url     = 'data://text/plain;base64,' . base64_encode((string)$wsdlContents);
+        $url     = 'data://text/plain;base64,' . base64_encode($wsdlContents);
 
         return new Client($url, $browser);
     }
