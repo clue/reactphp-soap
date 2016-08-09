@@ -4,10 +4,9 @@ namespace Clue\React\Soap;
 
 use Clue\React\Buzz\Browser;
 use Exception;
-use SoapClient;
 use Clue\React\Soap\Protocol\ClientEncoder;
 use Clue\React\Soap\Protocol\ClientDecoder;
-use Clue\React\Buzz\Message\Response;
+use Psr\Http\Message\ResponseInterface;
 use React\Promise\Deferred;
 
 class Client
@@ -49,7 +48,7 @@ class Client
         );
     }
 
-    public function handleResponse(Response $response)
+    public function handleResponse(ResponseInterface $response)
     {
         return $this->decoder->decode((string)$response->getBody());
     }
