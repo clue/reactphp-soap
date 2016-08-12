@@ -117,9 +117,10 @@ class FunctionalTest extends TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException SoapFault
+     * @expectedExeptionMessage Keine Bank zur BLZ invalid gefunden!
      */
-    public function testBlzServiceWithInvalidBlz()
+    public function testBlzServiceWithInvalidBlzRejectsWithSoapFault()
     {
         $api = new Proxy($this->client);
 
@@ -129,13 +130,14 @@ class FunctionalTest extends TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException SoapFault
+     * @expectedExceptionMessage Function ("doesNotExist") is not a valid method for this service
      */
-    public function testBlzServiceWithInvalidMethod()
+    public function testBlzServiceWithInvalidMethodRejectsWithSoapFault()
     {
         $api = new Proxy($this->client);
 
-        $promise = $api->doesNotexist();
+        $promise = $api->doesNotExist();
 
         Block\await($promise, $this->loop);
     }

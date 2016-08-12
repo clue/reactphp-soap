@@ -156,6 +156,12 @@ final class Client
     {
         $wsdl = $wsdlContents !== null ? 'data://text/plain;base64,' . base64_encode($wsdlContents) : null;
 
+        // Accept HTTP responses with error status codes as valid responses.
+        // This is done in order to process these error responses through the normal SOAP decoder.
+        $browser = $browser->withOptions(array(
+            'obeySuccessCode' => false
+        ));
+
         $this->browser = $browser;
         $this->encoder = new ClientEncoder($wsdl, $options);
         $this->decoder = new ClientDecoder($wsdl, $options);
@@ -199,7 +205,6 @@ final class Client
             }
         );
     }
-
 
     /**
      * Returns an array of functions defined in the WSDL.
