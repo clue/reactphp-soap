@@ -28,6 +28,24 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
 * **Good test coverage** -
   Comes with an automated tests suite and is regularly tested against actual web services in the wild
 
+**Table of contents**
+
+* [Quickstart example](#quickstart-example)
+* [Usage](#usage)
+  * [Factory](#factory)
+    * [createClient()](#createclient)
+    * [createClientFromWsdl()](#createclientfromwsdl)
+  * [Client](#client)
+    * [soapCall()](#soapcall)
+    * [getFunctions()](#getfunctions)
+    * [getTypes()](#gettypes)
+    * [getLocation()](#getlocation)
+  * [Proxy](#proxy)
+    * [Functions](#functions)
+    * [Processing](#processing)
+* [Install](#install)
+* [License](#license)
+
 > Note: This project is in beta stage! Feel free to report any issues you encounter.
 
 ## Quickstart example
@@ -90,9 +108,11 @@ $factory->createClient($url)->then(
 );
 ```
 
-#### createClientFromWsdl($wsdlContents)
+#### createClientFromWsdl()
 
-Same as createClient(), but leaves you the responsibility to load the WSDL file. This allows you to use local WSDL files, for instance.
+The `createClientFromWsdl($wsdlContents)` method works similar to `createClient()`,
+but leaves you the responsibility to load the WSDL file.
+This allows you to use local WSDL files, for instance.
 
 ### Client
 
