@@ -42,7 +42,8 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
     * [getLocation()](#getlocation)
   * [Proxy](#proxy)
     * [Functions](#functions)
-    * [Processing](#processing)
+    * [Promises](#promises)
+    * [Cancellation](#cancellation)
 * [Install](#install)
 * [Tests](#tests)
 * [License](#license)
@@ -209,7 +210,7 @@ $proxy->myMethod($myArg1, $myArg2)->then(function ($response) {
 Please refer to your WSDL or its accompanying documentation for details
 on which functions and arguments are supported.
 
-#### Processing
+#### Promises
 
 Issuing SOAP functions is async (non-blocking), so you can actually send multiple RPC requests in parallel.
 The web service will respond to each request with a return value. The order is not guaranteed.
@@ -224,6 +225,21 @@ $proxy->demo()->then(
     function (Exception $e) {
         // an error occured while executing the request
     }
+});
+```
+
+#### Cancellation
+
+The returned Promise is implemented in such a way that it can be cancelled
+when it is still pending.
+Cancelling a pending promise will reject its value with an Exception and
+clean up any underlying resources.
+
+```php
+$promise = $proxy->demo();
+
+$loop->addTimer(2.0, function () use ($promise) {
+    $promise->cancel();
 });
 ```
 
