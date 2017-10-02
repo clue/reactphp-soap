@@ -1,7 +1,6 @@
 <?php
 
 use Clue\React\Soap\Factory;
-use Clue\React\Soap\Proxy;
 use Clue\React\Soap\Client;
 
 require __DIR__ . '/../vendor/autoload.php';

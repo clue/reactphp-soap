@@ -44,6 +44,7 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
     * [Functions](#functions)
     * [Processing](#processing)
 * [Install](#install)
+* [Tests](#tests)
 * [License](#license)
 
 > Note: This project is in beta stage! Feel free to report any issues you encounter.
@@ -218,6 +219,21 @@ The recommended way to install this library is [through composer](http://getcomp
         "clue/soap-react": "~0.1.0"
     }
 }
+```
+
+## Tests
+
+To run the test suite, you first need to clone this repo and then install all
+dependencies [through Composer](https://getcomposer.org):
+
+```bash
+$ composer install
+```
+
+To run the test suite, go to the project root and run:
+
+```bash
+$ php vendor/bin/phpunit
 ```
 
 ## License
