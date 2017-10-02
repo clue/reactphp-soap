@@ -5,7 +5,7 @@ use Clue\React\Soap\Client;
 use Clue\React\Soap\Proxy;
 use Clue\React\Block;
 
-class FunctionalTest extends TestCase
+class FunctionalTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @var React\EventLoop\LoopInterface
@@ -24,7 +24,6 @@ class FunctionalTest extends TestCase
 
         $promise = $factory->createClient('http://www.thomas-bayer.com/axis2/services/BLZService?wsdl');
 
-        $this->expectPromiseResolve($promise);
         $this->client = Block\await($promise, $this->loop);
         /* @var $client Client */
     }
@@ -38,7 +37,6 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
-        $this->expectPromiseResolve($promise);
         $result = Block\await($promise, $this->loop);
 
         $this->assertInternalType('object', $result);
@@ -50,8 +48,6 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => 'invalid'));
 
-        $this->expectPromiseReject($promise);
-
         $this->setExpectedException('Exception');
         Block\await($promise, $this->loop);
     }
@@ -61,8 +57,6 @@ class FunctionalTest extends TestCase
         $api = new Proxy($this->client);
 
         $promise = $api->doesNotexist();
-
-        $this->expectPromiseReject($promise);
 
         $this->setExpectedException('Exception');
         Block\await($promise, $this->loop);
