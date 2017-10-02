@@ -1,6 +1,7 @@
 # clue/soap-react [![Build Status](https://travis-ci.org/clue/php-soap-react.svg?branch=master)](https://travis-ci.org/clue/php-soap-react)
 
-A simple, async [SOAP](http://en.wikipedia.org/wiki/SOAP) web service client library, built on top of [React PHP](http://reactphp.org/).
+Simple, async [SOAP](http://en.wikipedia.org/wiki/SOAP) web service client library,
+built on top of [ReactPHP](https://reactphp.org/).
 
 Most notably, SOAP is often used for invoking
 [Remote procedure calls](http://en.wikipedia.org/wiki/Remote_procedure_call) (RPCs)
@@ -9,7 +10,6 @@ Internally, SOAP messages are encoded as XML and usually sent via HTTP POST requ
 For the most part, SOAP (originally *Simple Object Access protocol*) is a protocol of the past,
 and in fact anything but *simple*.
 It is still in use by many (often *legacy*) systems.
-
 This project provides a *simple* API for invoking *async* RPCs to remote web services.
 
 * **Async execution of functions** -
@@ -46,8 +46,6 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
 * [Install](#install)
 * [Tests](#tests)
 * [License](#license)
-
-> Note: This project is in beta stage! Feel free to report any issues you encounter.
 
 ## Quickstart example
 
@@ -210,16 +208,20 @@ $proxy->demo()->then(
 
 ## Install
 
-The recommended way to install this library is [through composer](http://getcomposer.org).
-[New to composer?](http://getcomposer.org/doc/00-intro.md)
+The recommended way to install this library is [through Composer](https://getcomposer.org).
+[New to Composer?](https://getcomposer.org/doc/00-intro.md)
 
-```JSON
-{
-    "require": {
-        "clue/soap-react": "~0.1.0"
-    }
-}
+This will install the latest supported version:
+
+```bash
+$ composer require clue/soap-react:^0.2
 ```
+
+See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
+
+This project aims to run on any platform and thus only requires `ext-soap` and
+supports running on legacy PHP 5.3 through current PHP 7+ and HHVM.
+It's *highly recommended to use PHP 7+* for this project.
 
 ## Tests
 

@@ -1,7 +1,7 @@
 {
     "name": "clue/soap-react",
-    "description": "Simple, async SOAP webservice client library",
-    "keywords": ["SOAP", "WebService", "WSDL", "React"],
+    "description": "Simple, async SOAP webservice client library, built on top of ReactPHP",
+    "keywords": ["SOAP", "SoapClient", "WebService", "WSDL", "ReactPHP"],
     "homepage": "https://github.com/clue/php-soap-react",
     "license": "MIT",
     "authors": [
