@@ -166,10 +166,10 @@ assert('http://example.com/soap/service' == $client->getLocation(0));
 
 Passing a `$function` not defined in the WSDL file will throw a `SoapFault`. 
 
-#### withTarget($newTarget)
+#### withRequestTarget($requestTarget)
 
-This method allows you to change the destination of your SOAP calls. It does not change the Client object, but returns a new
-Client with the overriden target.
+This method allows you to change the destination of your SOAP calls. It returns a new Client instance
+with the specified request-target.
 
 ### Proxy
 

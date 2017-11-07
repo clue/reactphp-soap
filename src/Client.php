@@ -50,7 +50,7 @@ class Client
 
     public function handleResponse(ResponseInterface $response)
     {
-        return $this->decoder->decode((string) $response->getBody());
+        return $this->decoder->decode((string)$response->getBody());
     }
 
     public function handleError(Exception $error)
@@ -103,10 +103,11 @@ class Client
         return (string)$this->encoder->encode($function, array())->getUri();
     }
 
-    public function withTarget($target)
+    public function withRequestTarget($requestTarget)
     {
         $copy = clone $this;
-        $copy->encoder = $this->encoder->withTarget($target);
+        $copy->encoder = $this->encoder->withRequestTarget($requestTarget);
+
         return $copy;
     }
 }
