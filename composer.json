@@ -22,6 +22,6 @@
     },
     "require-dev": {
         "clue/block-react": "~0.3.0",
-        "phpunit/phpunit": "^5.0 || ^4.8"
+        "phpunit/phpunit": "^6.4 || ^5.7 || ^4.8.35"
     }
 }

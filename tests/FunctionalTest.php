@@ -4,8 +4,9 @@ use Clue\React\Soap\Factory;
 use Clue\React\Soap\Client;
 use Clue\React\Soap\Proxy;
 use Clue\React\Block;
+use PHPUnit\Framework\TestCase;
 
-class FunctionalTest extends PHPUnit_Framework_TestCase
+class FunctionalTest extends TestCase
 {
     /**
      * @var React\EventLoop\LoopInterface
@@ -42,23 +43,27 @@ class FunctionalTest extends PHPUnit_Framework_TestCase
         $this->assertInternalType('object', $result);
     }
 
+    /**
+     * @expectedException Exception
+     */
     public function testBlzServiceWithInvalidBlz()
     {
         $api = new Proxy($this->client);
 
         $promise = $api->getBank(array('blz' => 'invalid'));
 
-        $this->setExpectedException('Exception');
         Block\await($promise, $this->loop);
     }
 
+    /**
+     * @expectedException Exception
+     */
     public function testBlzServiceWithInvalidMethod()
     {
         $api = new Proxy($this->client);
 
         $promise = $api->doesNotexist();
 
-        $this->setExpectedException('Exception');
         Block\await($promise, $this->loop);
     }
 
