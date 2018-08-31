@@ -48,6 +48,24 @@ class FunctionalTest extends TestCase
         $this->assertInternalType('object', $result);
     }
 
+    public function testBlzServiceWithSoapV12()
+    {
+        $this->client = new Client(new Browser($this->loop), self::$wsdl, array(
+            'soap_version' => SOAP_1_2
+        ));
+
+        $this->assertCount(2, $this->client->getFunctions());
+        $this->assertCount(3, $this->client->getTypes());
+
+        $api = new Proxy($this->client);
+
+        $promise = $api->getBank(array('blz' => '12070000'));
+
+        $result = Block\await($promise, $this->loop);
+
+        $this->assertInternalType('object', $result);
+    }
+
     public function testBlzServiceNonWsdlMode()
     {
         $this->client = new Client(new Browser($this->loop), null, array(

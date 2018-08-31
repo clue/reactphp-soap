@@ -13,7 +13,7 @@ final class ClientDecoder extends SoapClient
 
     public function __construct()
     {
-        // to not pass actual WSDL to parent constructor
+        // do not pass actual WSDL to parent constructor
         // use faked non-wsdl-mode to let every method call pass through (pseudoCall)
         parent::__construct(null, array('location' => '1', 'uri' => '2'));
     }

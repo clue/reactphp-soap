@@ -174,6 +174,15 @@ $client = new Client($browser, $wsdl, array(
 ));
 ```
 
+You can use the `soap_version` option to change from the default SOAP 1.1 to
+use SOAP 1.2 instead:
+
+```php
+$client = new Client($browser, $wsdl, array(
+    'soap_version' => SOAP_1_2
+));
+```
+
 If you find an option is missing or not supported here, PRs are much
 appreciated!
 

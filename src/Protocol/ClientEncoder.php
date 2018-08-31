@@ -44,14 +44,22 @@ final class ClientEncoder extends SoapClient
      */
     public function __doRequest($request, $location, $action, $version, $one_way = 0)
     {
+        $headers = array();
+        if ($version === SOAP_1_1) {
+            $headers = array(
+                'SOAPAction' => $action,
+                'Content-Type' => 'text/xml; charset=utf-8'
+            );
+        } elseif ($version === SOAP_1_2) {
+            $headers = array(
+                'Content-Type' => 'application/soap+xml; charset=utf-8; action=' . $action
+            );
+        }
+
         $this->request = new Request(
             'POST',
             (string)$location,
-            array(
-                'SOAPAction' => (string)$action,
-                'Content-Type' => 'text/xml; charset=utf-8',
-                'Content-Length' => strlen($request)
-            ),
+            $headers,
             (string)$request
         );
 
