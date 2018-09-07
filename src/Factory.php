@@ -6,7 +6,7 @@ use React\EventLoop\LoopInterface;
 use Clue\React\Buzz\Browser;
 use Psr\Http\Message\ResponseInterface;
 
-class Factory
+final class Factory
 {
     private $loop;
     private $browser;

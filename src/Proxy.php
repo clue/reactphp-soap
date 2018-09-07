@@ -2,8 +2,10 @@
 
 namespace Clue\React\Soap;
 
-class Proxy
+final class Proxy
 {
+    private $client;
+
     public function __construct(Client $client)
     {
         $this->client = $client;

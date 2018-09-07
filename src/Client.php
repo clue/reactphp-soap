@@ -3,19 +3,27 @@
 namespace Clue\React\Soap;
 
 use Clue\React\Buzz\Browser;
-use Exception;
-use Clue\React\Soap\Protocol\ClientEncoder;
 use Clue\React\Soap\Protocol\ClientDecoder;
+use Clue\React\Soap\Protocol\ClientEncoder;
 use Psr\Http\Message\ResponseInterface;
 use React\Promise\Deferred;
 
-class Client
+final class Client
 {
     private $wsdl;
     private $browser;
     private $encoder;
     private $decoder;
 
+    /**
+     * [internal] Instantiate new SOAP client, see Factory instead
+     *
+     * @param string $wsdl
+     * @param Browser $browser
+     * @param ClientEncoder $encoder
+     * @param ClientDecoder $decoder
+     * @internal
+     */
     public function __construct($wsdl, Browser $browser, ClientEncoder $encoder = null, ClientDecoder $decoder = null)
     {
         if ($encoder === null) {
@@ -43,19 +51,18 @@ class Client
         }
 
         return $this->browser->send($request)->then(
-            array($this, 'handleResponse'),
-            array($this, 'handleError')
+            array($this, 'handleResponse')
         );
     }
 
+    /**
+     * @param ResponseInterface $response
+     * @return mixed
+     * @internal
+     */
     public function handleResponse(ResponseInterface $response)
     {
         return $this->decoder->decode((string)$response->getBody());
-    }
-
-    public function handleError(Exception $error)
-    {
-        throw $error;
     }
 
     public function getFunctions()
@@ -87,7 +94,7 @@ class Client
      *
      * @param string|int $function
      * @return string
-     * @throws SoapFault if given function does not exist
+     * @throws \SoapFault if given function does not exist
      * @see self::getFunctions()
      */
     public function getLocation($function)
