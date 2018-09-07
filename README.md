@@ -1,4 +1,4 @@
-# clue/soap-react [![Build Status](https://travis-ci.org/clue/php-soap-react.svg?branch=master)](https://travis-ci.org/clue/php-soap-react)
+# clue/reactphp-soap [![Build Status](https://travis-ci.org/clue/reactphp-soap.svg?branch=master)](https://travis-ci.org/clue/reactphp-soap)
 
 Simple, async [SOAP](http://en.wikipedia.org/wiki/SOAP) web service client library,
 built on top of [ReactPHP](https://reactphp.org/).
@@ -84,7 +84,7 @@ $factory = new Factory($loop);
 ```
 
 If you need custom DNS or proxy settings, you can explicitly pass a
-custom [`Browser`](https://github.com/clue/php-buzz-react#browser) instance:
+custom [`Browser`](https://github.com/clue/reactphp-buzz#browser) instance:
 
 ```php
 $browser = new Clue\React\Buzz\Browser($loop);
