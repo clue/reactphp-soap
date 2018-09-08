@@ -1,11 +1,14 @@
 <?php
 
+use Clue\React\Block;
 use Clue\React\Soap\Factory;
 use Clue\React\Soap\Client;
 use Clue\React\Soap\Proxy;
-use Clue\React\Block;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group internet
+ */
 class FunctionalTest extends TestCase
 {
     /**
