@@ -21,7 +21,7 @@
         "ext-soap": "*"
     },
     "require-dev": {
-        "clue/block-react": "~0.3.0",
+        "clue/block-react": "^1.0",
         "phpunit/phpunit": "^6.4 || ^5.7 || ^4.8.35"
     }
 }
