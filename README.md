@@ -93,8 +93,8 @@ $factory = new Factory($loop, $browser);
 
 #### createClient()
 
-The `createClient($wsdl)` method can be used to download the WSDL at the
-given URL into memory and create a new [`Client`](#client).
+The `createClient(string $wsdl): PromiseInterface<Client, Exception>` method can be used to
+download the WSDL at the given URL into memory and create a new [`Client`](#client).
 
 ```php
 $factory->createClient($url)->then(
@@ -102,16 +102,18 @@ $factory->createClient($url)->then(
         // client ready
     },
     function (Exception $e) {
-        // an error occured while trying to download the WSDL
+        // an error occured while trying to download or parse the WSDL
     }
 );
 ```
 
 #### createClientFromWsdl()
 
-The `createClientFromWsdl($wsdlContents)` method works similar to `createClient()`,
-but leaves you the responsibility to load the WSDL file.
-This allows you to use local WSDL files, for instance.
+The `createClientFromWsdl(string $wsdlContents): Client` method can be used to
+create a new [`Client`](#client) from the given WSDL contents.
+
+This works similar to `createClient()`, but leaves you the responsibility to load
+the WSDL file. This allows you to use local WSDL files, for instance.
 
 ### Client
 
@@ -125,25 +127,41 @@ All public methods of the `Client` are considered *advanced usage*.
 
 #### soapCall()
 
-The `soapCall($method, $arguments)` method can be used to queue the given
-function to be sent via SOAP and wait for a response from the remote web service.
+The `soapCall(string $method, mixed[] $arguments): PromiseInterface<mixed, Exception>` method can be used to
+queue the given function to be sent via SOAP and wait for a response from the remote web service.
+
+```php
+// advanced usage, see Proxy for recommended alternative
+$promise = $client->soapCall('ping', array('hello', 42));
+```
 
 Note: This is considered *advanced usage*, you may want to look into using the [`Proxy`](#proxy) instead.
 
+```php
+$proxy = new Proxy($client);
+$promise = $proxy->ping('hello', 42);
+```
+
 #### getFunctions()
 
-The `getFunctions()` method returns an array of functions defined in the WSDL.
-It returns the equivalent of PHP's [`SoapClient::__getFunctions()`](http://php.net/manual/en/soapclient.getfunctions.php).
+The `getFunctions(): string[]` method can be used to
+return an array of functions defined in the WSDL.
+
+It returns the equivalent of PHP's 
+[`SoapClient::__getFunctions()`](http://php.net/manual/en/soapclient.getfunctions.php).
 
 #### getTypes()
 
-The `getTypes()` method returns an array of types defined in the WSDL.
-It returns the equivalent of PHP's [`SoapClient::__getTypes()`](http://php.net/manual/en/soapclient.gettypes.php).
+The `getTypes(): string[]` method can be used to
+return an array of types defined in the WSDL.
+
+It returns the equivalent of PHP's
+[`SoapClient::__getTypes()`](http://php.net/manual/en/soapclient.gettypes.php).
 
 #### getLocation()
 
-The `getLocation($function)` method can be used to return the location (URI)
-of the given webservice `$function`.
+The `getLocation(string|int $function): string` method can be used to
+return the location (URI) of the given webservice `$function`.
 
 Note that this is not to be confused with the WSDL file location.
 A WSDL file can contain any number of function definitions.
@@ -153,6 +171,10 @@ However, technically each function can potentially use a different location.
 The `$function` parameter should be a string with the the SOAP function name.
 See also [`getFunctions()`](#getfunctions) for a list of all available functions.
 
+```php
+assert('http://example.com/soap/service' === $client->getLocation('echo'));
+```
+
 For easier access, this function also accepts a numeric function index.
 It then uses [`getFunctions()`](#getfunctions) internally to get the function
 name for the given index.
@@ -160,8 +182,7 @@ This is particularly useful for the very common case where all functions use the
 same location and accessing the first location is sufficient.
 
 ```php
-assert('http://example.com/soap/service' == $client->getLocation('echo'));
-assert('http://example.com/soap/service' == $client->getLocation(0));
+assert('http://example.com/soap/service' === $client->getLocation(0));
 ```
 
 Passing a `$function` not defined in the WSDL file will throw a `SoapFault`. 
