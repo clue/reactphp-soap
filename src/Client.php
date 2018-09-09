@@ -20,34 +20,23 @@ use React\Promise\PromiseInterface;
  */
 final class Client
 {
-    private $wsdl;
     private $browser;
     private $encoder;
     private $decoder;
 
     /**
-     * [internal] Instantiate new SOAP client, see Factory instead
+     * Instantiate new SOAP client
      *
-     * @param string $wsdl
      * @param Browser $browser
-     * @param ClientEncoder $encoder
-     * @param ClientDecoder $decoder
-     * @internal
+     * @param string  $wsdlContents
      */
-    public function __construct($wsdl, Browser $browser, ClientEncoder $encoder = null, ClientDecoder $decoder = null)
+    public function __construct(Browser $browser, $wsdlContents)
     {
-        if ($encoder === null) {
-            $encoder = new ClientEncoder($wsdl);
-        }
-
-        if ($decoder === null) {
-            $decoder = new ClientDecoder($wsdl);
-        }
-
-        $this->wsdl = $wsdl;
         $this->browser = $browser;
-        $this->encoder = $encoder;
-        $this->decoder = $decoder;
+        $this->encoder = new ClientEncoder(
+            'data://text/plain;base64,' . base64_encode($wsdlContents)
+        );
+        $this->decoder = new ClientDecoder();
     }
 
     /**

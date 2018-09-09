@@ -27,7 +27,6 @@ use React\Promise\PromiseInterface;
  */
 final class Factory
 {
-    private $loop;
     private $browser;
 
     public function __construct(LoopInterface $loop, Browser $browser = null)
@@ -35,7 +34,6 @@ final class Factory
         if ($browser === null) {
             $browser = new Browser($loop);
         }
-        $this->loop = $loop;
         $this->browser = $browser;
     }
 
@@ -53,15 +51,18 @@ final class Factory
      * );
      * ```
      *
-     * @param string $wsdl
+     * @param string $wsdlUri
      * @return PromiseInterface Returns a Promise<Client, Exception>
      */
-    public function createClient($wsdl)
+    public function createClient($wsdlUri)
     {
-        $that = $this;
+        $browser = $this->browser;
 
-        return $this->browser->get($wsdl)->then(function (ResponseInterface $response) use ($that) {
-            return $that->createClientFromWsdl((string)$response->getBody());
+        return $this->browser->get($wsdlUri)->then(function (ResponseInterface $response) use ($browser) {
+            return new Client(
+                $browser,
+                (string)$response->getBody()
+            );
         });
     }
 
@@ -76,9 +77,6 @@ final class Factory
      */
     public function createClientFromWsdl($wsdlContents)
     {
-        $browser = $this->browser;
-        $url     = 'data://text/plain;base64,' . base64_encode($wsdlContents);
-
-        return new Client($url, $browser);
+        return new Client($this->browser, $wsdlContents);
     }
 }
