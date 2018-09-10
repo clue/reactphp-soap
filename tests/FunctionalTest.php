@@ -70,6 +70,32 @@ class FunctionalTest extends TestCase
         Block\await($promise, $this->loop);
     }
 
+    /**
+     * @expectedException Exception
+     */
+    public function testCancelCreateClientRejects()
+    {
+        $factory = new Factory($this->loop);
+
+        $promise = $factory->createClient('http://www.thomas-bayer.com/axis2/services/BLZService?wsdl');
+        $promise->cancel();
+
+        Block\await($promise, $this->loop);
+    }
+
+    /**
+     * @expectedException Exception
+     */
+    public function testCancelMethodRejects()
+    {
+        $api = new Proxy($this->client);
+
+        $promise = $api->getBank(array('blz' => '12070000'));
+        $promise->cancel();
+
+        Block\await($promise, $this->loop);
+    }
+
     public function testGetLocationForFunctionName()
     {
         $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation('getBank'));
