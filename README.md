@@ -32,9 +32,6 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
 
 * [Quickstart example](#quickstart-example)
 * [Usage](#usage)
-  * [Factory](#factory)
-    * [createClient()](#createclient)
-    * [createClientFromWsdl()](#createclientfromwsdl)
   * [Client](#client)
     * [soapCall()](#soapcall)
     * [getFunctions()](#getfunctions)
@@ -55,10 +52,11 @@ web service via SOAP:
 
 ```php
 $loop = React\EventLoop\Factory::create();
-$factory = new Factory($loop);
+$browser = new Browser($loop);
 $wsdl = 'http://example.com/demo.wsdl';
 
-$factory->createClient($wsdl)->then(function (Client $client) {
+$browser->get($wsdl)->then(function (ResponseInterface $response) use ($browser) {
+    $client = new Client($browser, (string)$response->getBody());
     $api = new Proxy($client);
 
     $api->getBank(array('blz' => '12070000'))->then(function ($result) {
@@ -73,53 +71,76 @@ See also the [examples](examples).
 
 ## Usage
 
-### Factory
-
-The `Factory` class is responsible for fetching the WSDL file once and constructing
-the [`Client`](#client) instance.
-It also registers everything with the main [`EventLoop`](https://github.com/reactphp/event-loop#usage).
-
-```php
-$loop = React\EventLoop\Factory::create();
-$factory = new Factory($loop);
-```
-
-If you need custom DNS or proxy settings, you can explicitly pass a
-custom [`Browser`](https://github.com/clue/reactphp-buzz#browser) instance:
-
-```php
-$browser = new Clue\React\Buzz\Browser($loop);
-$factory = new Factory($loop, $browser);
-```
-
-#### createClient()
-
-The `createClient(string $wsdl): PromiseInterface<Client, Exception>` method can be used to
-download the WSDL at the given URL into memory and create a new [`Client`](#client).
-
-```php
-$factory->createClient($url)->then(
-    function (Client $client) {
-        // client ready
-    },
-    function (Exception $e) {
-        // an error occured while trying to download or parse the WSDL
-    }
-);
-```
-
-#### createClientFromWsdl()
-
-The `createClientFromWsdl(string $wsdlContents): Client` method can be used to
-create a new [`Client`](#client) from the given WSDL contents.
-
-This works similar to `createClient()`, but leaves you the responsibility to load
-the WSDL file. This allows you to use local WSDL files, for instance.
-
 ### Client
 
 The `Client` class is responsible for communication with the remote SOAP
 WebService server.
+
+It requires a [`Browser`](https://github.com/clue/reactphp-buzz#browser) object
+bound to the main [`EventLoop`](https://github.com/reactphp/event-loop#usage)
+in order to handle async requests and the WSDL file contents:
+
+```php
+$loop = React\EventLoop\Factory::create();
+$browser = new Clue\React\Buzz\Browser($loop);
+
+$client = new Client($browser, $wsdl);
+```
+
+If you need custom DNS, TLS or proxy settings, you can explicitly pass a
+custom [`Browser`](https://github.com/clue/reactphp-buzz#browser) instance:
+
+```php
+$connector = new \React\Socket\Connector($loop, array(
+    'dns' => '127.0.0.1',
+    'tcp' => array(
+        'bindto' => '192.168.10.1:0'
+    ),
+    'tls' => array(
+        'verify_peer' => false,
+        'verify_peer_name' => false
+    )
+));
+
+$browser = new Browser($loop, $connector);
+$client = new Client($browser, $wsdl);
+```
+
+The `Client` works similar to PHP's `SoapClient` (which it uses under the
+hood), but leaves you the responsibility to load the WSDL file. This allows
+you to use local WSDL files, WSDL files from a cache or the most common form,
+downloading the WSDL file contents from an URL through the `Browser`:
+
+```php
+$browser = new Browser($loop);
+
+$browser->get($url)->then(
+    function (ResponseInterface $response) use ($browser) {
+        // WSDL file is ready, create client
+        $client = new Client($browser, (string)$response->getBody());
+        …
+    },
+    function (Exception $e) {
+        // an error occured while trying to download the WSDL
+    }
+);
+```
+
+The `Client` constructor loads the given WSDL file contents into memory and
+parses its definition. If the given WSDL file is invalid and can not be
+parsed, this will throw a `SoapFault`:
+
+```php
+try {
+    $client = new Client($browser, $wsdl);
+} catch (SoapFault $e) {
+    echo 'Error: ' . $e->getMessage() . PHP_EOL;
+}
+```
+
+> Note that if you have `ext-debug` loaded, this may halt with a fatal
+  error instead of throwing a `SoapFault`. It is not recommended to use this
+  extension in production, so this should only ever affect test environments.
 
 If you want to call RPC functions, see below for the [`Proxy`](#proxy) class.
 
