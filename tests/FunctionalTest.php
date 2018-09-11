@@ -1,7 +1,7 @@
 <?php
 
 use Clue\React\Block;
-use Clue\React\Soap\Factory;
+use Clue\React\Buzz\Browser;
 use Clue\React\Soap\Client;
 use Clue\React\Soap\Proxy;
 use PHPUnit\Framework\TestCase;
@@ -23,13 +23,10 @@ class FunctionalTest extends TestCase
 
     public function setUp()
     {
+        $wsdl = file_get_contents('http://www.thomas-bayer.com/axis2/services/BLZService?wsdl');
+
         $this->loop = React\EventLoop\Factory::create();
-        $factory = new Factory($this->loop);
-
-        $promise = $factory->createClient('http://www.thomas-bayer.com/axis2/services/BLZService?wsdl');
-
-        $this->client = Block\await($promise, $this->loop);
-        /* @var $client Client */
+        $this->client = new Client(new Browser($this->loop), $wsdl);
     }
 
     public function testBlzService()
@@ -66,19 +63,6 @@ class FunctionalTest extends TestCase
         $api = new Proxy($this->client);
 
         $promise = $api->doesNotexist();
-
-        Block\await($promise, $this->loop);
-    }
-
-    /**
-     * @expectedException Exception
-     */
-    public function testCancelCreateClientRejects()
-    {
-        $factory = new Factory($this->loop);
-
-        $promise = $factory->createClient('http://www.thomas-bayer.com/axis2/services/BLZService?wsdl');
-        $promise->cancel();
 
         Block\await($promise, $this->loop);
     }
