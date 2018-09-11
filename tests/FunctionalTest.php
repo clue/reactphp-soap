@@ -21,12 +21,17 @@ class FunctionalTest extends TestCase
      */
     private $client;
 
+    // download WSDL file only once for all test cases
+    private static $wsdl;
+    public static function setUpBeforeClass()
+    {
+        self::$wsdl = file_get_contents('http://www.thomas-bayer.com/axis2/services/BLZService?wsdl');
+    }
+
     public function setUp()
     {
-        $wsdl = file_get_contents('http://www.thomas-bayer.com/axis2/services/BLZService?wsdl');
-
         $this->loop = React\EventLoop\Factory::create();
-        $this->client = new Client(new Browser($this->loop), $wsdl);
+        $this->client = new Client(new Browser($this->loop), self::$wsdl);
     }
 
     public function testBlzService()
@@ -105,5 +110,14 @@ class FunctionalTest extends TestCase
     public function testGetLocationForUnknownFunctionNumberFails()
     {
         $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation(100));
+    }
+
+    public function testGetLocationWithExplicitLocationOptionReturnsAsIs()
+    {
+        $this->client = new Client(new Browser($this->loop), self::$wsdl, array(
+            'location' => 'http://example.com/'
+        ));
+
+        $this->assertEquals('http://example.com/', $this->client->getLocation(0));
     }
 }
