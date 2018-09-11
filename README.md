@@ -146,14 +146,27 @@ try {
   error instead of throwing a `SoapFault`. It is not recommended to use this
   extension in production, so this should only ever affect test environments.
 
-The `Client` constructor accepts an optional array of options. All given
-options will be passed through to the underlying `SoapClient`. However, not
-all options make sense in this async implementation and as such may not have
-the desired effect. See also [`SoapClient`](http://php.net/manual/en/soapclient.soapclient.php)
+The `Client` constructor accepts an array of options. All given options will
+be passed through to the underlying `SoapClient`. However, not all options
+make sense in this async implementation and as such may not have the desired
+effect. See also [`SoapClient`](http://php.net/manual/en/soapclient.soapclient.php)
 documentation for more details.
 
-The `location` option can be used to explicitly overwrite the URL of the SOAP
-server to send the request to:
+If working in WSDL mode, the `$options` parameter is optional. If working in
+non-WSDL mode, the WSDL parameter must be set to `null` and the options
+parameter must contain the `location` and `uri` options, where `location` is
+the URL of the SOAP server to send the request to, and `uri` is the target
+namespace of the SOAP service:
+
+```php
+$client = new Client($browser, null, array(
+    'location' => 'http://example.com',
+    'uri' => 'http://ping.example.com',
+));
+```
+
+Similarly, if working in WSDL mode, the `location` option can be used to
+explicitly overwrite the URL of the SOAP server to send the request to:
 
 ```php
 $client = new Client($browser, $wsdl, array(
@@ -188,19 +201,21 @@ $promise = $proxy->ping('hello', 42);
 
 #### getFunctions()
 
-The `getFunctions(): string[]` method can be used to
+The `getFunctions(): string[]|null` method can be used to
 return an array of functions defined in the WSDL.
 
 It returns the equivalent of PHP's 
 [`SoapClient::__getFunctions()`](http://php.net/manual/en/soapclient.getfunctions.php).
+In non-WSDL mode, this method returns `null`.
 
 #### getTypes()
 
-The `getTypes(): string[]` method can be used to
+The `getTypes(): string[]|null` method can be used to
 return an array of types defined in the WSDL.
 
 It returns the equivalent of PHP's
 [`SoapClient::__getTypes()`](http://php.net/manual/en/soapclient.gettypes.php).
+In non-WSDL mode, this method returns `null`.
 
 #### getLocation()
 
@@ -229,8 +244,9 @@ same location and accessing the first location is sufficient.
 assert('http://example.com/soap/service' === $client->getLocation(0));
 ```
 
-When the `location` option has been set in the `Client` constructor, this
-method returns the value of the given `location` option.
+When the `location` option has been set in the `Client` constructor
+(such as when in non-WSDL mode), this method returns the value of the
+given `location` option.
 
 Passing a `$function` not defined in the WSDL file will throw a `SoapFault`. 
 

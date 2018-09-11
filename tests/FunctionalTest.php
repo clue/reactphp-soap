@@ -48,6 +48,25 @@ class FunctionalTest extends TestCase
         $this->assertInternalType('object', $result);
     }
 
+    public function testBlzServiceNonWsdlMode()
+    {
+        $this->client = new Client(new Browser($this->loop), null, array(
+            'location' => 'http://www.thomas-bayer.com/axis2/services/BLZService',
+            'uri' => 'http://thomas-bayer.com/blz/',
+            'use' => SOAP_LITERAL
+        ));
+
+        $api = new Proxy($this->client);
+
+        // try encoding the "blz" parameter with the correct namespace (see uri)
+        // $promise = $api->getBank(new SoapParam('12070000', 'ns1:blz'));
+        $promise = $api->getBank(new SoapVar('12070000', XSD_STRING, null, null, 'blz', 'http://thomas-bayer.com/blz/'));
+
+        $result = Block\await($promise, $this->loop);
+
+        $this->assertInternalType('object', $result);
+    }
+
     /**
      * @expectedException Exception
      */
