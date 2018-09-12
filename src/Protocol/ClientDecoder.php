@@ -11,28 +11,24 @@ final class ClientDecoder extends SoapClient
 {
     private $response = null;
 
-    public function __construct()
-    {
-        // do not pass actual WSDL to parent constructor
-        // use faked non-wsdl-mode to let every method call pass through (pseudoCall)
-        parent::__construct(null, array('location' => '1', 'uri' => '2'));
-    }
-
     /**
      * Decodes the SOAP response / return value from the given SOAP envelope (HTTP response body)
      *
+     * @param string $function
      * @param string $response
      * @return mixed
      * @throws \SoapFault if response indicates a fault (error condition) or is invalid
      */
-    public function decode($response)
+    public function decode($function, $response)
     {
-        // temporarily save response internally for further processing
+        // Temporarily save response internally for further processing
         $this->response = $response;
 
-        // pretend we just invoked a SOAP function.
-        // internally, use the injected response to parse its results
-        $ret = $this->pseudoCall();
+        // Let's pretend we just invoked the given SOAP function.
+        // This won't actually invoke anything (see `__doRequest()`), but this
+        // requires a valid function name to match its definition in the WSDL.
+        // Internally, simply use the injected response to parse its results.
+        $ret = $this->__soapCall($function, array());
         $this->response = null;
 
         return $ret;

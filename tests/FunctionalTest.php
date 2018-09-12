@@ -6,6 +6,10 @@ use Clue\React\Soap\Client;
 use Clue\React\Soap\Proxy;
 use PHPUnit\Framework\TestCase;
 
+class BankResponse
+{
+}
+
 /**
  * @group internet
  */
@@ -46,6 +50,30 @@ class FunctionalTest extends TestCase
         $result = Block\await($promise, $this->loop);
 
         $this->assertInternalType('object', $result);
+        $this->assertTrue(isset($result->details));
+        $this->assertTrue(isset($result->details->bic));
+    }
+
+    public function testBlzServiceWithClassmapReturnsExpectedType()
+    {
+        $this->client = new Client(new Browser($this->loop), self::$wsdl, array(
+            'classmap' => array(
+                'getBankResponseType' => 'BankResponse'
+            )
+        ));
+
+        $this->assertCount(2, $this->client->getFunctions());
+        $this->assertCount(3, $this->client->getTypes());
+
+        $api = new Proxy($this->client);
+
+        $promise = $api->getBank(array('blz' => '12070000'));
+
+        $result = Block\await($promise, $this->loop);
+
+        $this->assertInstanceOf('BankResponse', $result);
+        $this->assertTrue(isset($result->details));
+        $this->assertTrue(isset($result->details->bic));
     }
 
     public function testBlzServiceWithSoapV12()
@@ -64,14 +92,15 @@ class FunctionalTest extends TestCase
         $result = Block\await($promise, $this->loop);
 
         $this->assertInternalType('object', $result);
+        $this->assertTrue(isset($result->details));
+        $this->assertTrue(isset($result->details->bic));
     }
 
-    public function testBlzServiceNonWsdlMode()
+    public function testBlzServiceNonWsdlModeReturnedWithoutOuterResultStructure()
     {
         $this->client = new Client(new Browser($this->loop), null, array(
             'location' => 'http://www.thomas-bayer.com/axis2/services/BLZService',
             'uri' => 'http://thomas-bayer.com/blz/',
-            'use' => SOAP_LITERAL
         ));
 
         $api = new Proxy($this->client);
@@ -83,6 +112,8 @@ class FunctionalTest extends TestCase
         $result = Block\await($promise, $this->loop);
 
         $this->assertInternalType('object', $result);
+        $this->assertFalse(isset($result->details));
+        $this->assertTrue(isset($result->bic));
     }
 
     /**
