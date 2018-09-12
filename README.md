@@ -183,6 +183,17 @@ $client = new Client($browser, $wsdl, array(
 ));
 ```
 
+You can use the `classmap` option to map certain WSDL types to PHP classes
+like this:
+
+```php
+$client = new Client($browser, $wsdl, array(
+    'classmap' => array(
+        'getBankResponseType' => BankResponse::class
+    )
+));
+```
+
 If you find an option is missing or not supported here, PRs are much
 appreciated!
 

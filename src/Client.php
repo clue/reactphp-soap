@@ -120,6 +120,17 @@ use React\Promise\PromiseInterface;
  * ));
  * ```
  *
+ * You can use the `classmap` option to map certain WSDL types to PHP classes
+ * like this:
+ *
+ * ```php
+ * $client = new Client($browser, $wsdl, array(
+ *     'classmap' => array(
+ *         'getBankResponseType' => BankResponse::class
+ *     )
+ * ));
+ * ```
+ *
  * If you find an option is missing or not supported here, PRs are much
  * appreciated!
  *
@@ -143,12 +154,11 @@ final class Client
      */
     public function __construct(Browser $browser, $wsdlContents, array $options = array())
     {
+        $wsdl = $wsdlContents !== null ? 'data://text/plain;base64,' . base64_encode($wsdlContents) : null;
+
         $this->browser = $browser;
-        $this->encoder = new ClientEncoder(
-            $wsdlContents !== null ? 'data://text/plain;base64,' . base64_encode($wsdlContents) : null,
-            $options
-        );
-        $this->decoder = new ClientDecoder();
+        $this->encoder = new ClientEncoder($wsdl, $options);
+        $this->decoder = new ClientDecoder($wsdl, $options);
     }
 
     /**
@@ -180,8 +190,13 @@ final class Client
             return $deferred->promise();
         }
 
+        $decoder = $this->decoder;
+
         return $this->browser->send($request)->then(
-            array($this, 'handleResponse')
+            function (ResponseInterface $response) use ($decoder, $name) {
+                // HTTP response received => decode results for this function call
+                return $decoder->decode($name, (string)$response->getBody());
+            }
         );
     }
 
@@ -261,15 +276,5 @@ final class Client
 
         // encode request for given $function
         return (string)$this->encoder->encode($function, array())->getUri();
-    }
-
-    /**
-     * @param ResponseInterface $response
-     * @return mixed
-     * @internal
-     */
-    public function handleResponse(ResponseInterface $response)
-    {
-        return $this->decoder->decode((string)$response->getBody());
     }
 }
