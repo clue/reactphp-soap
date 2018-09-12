@@ -78,13 +78,17 @@ WebService server.
 
 It requires a [`Browser`](https://github.com/clue/reactphp-buzz#browser) object
 bound to the main [`EventLoop`](https://github.com/reactphp/event-loop#usage)
-in order to handle async requests and the WSDL file contents:
+in order to handle async requests, the WSDL file contents and an optional
+array of SOAP options:
 
 ```php
 $loop = React\EventLoop\Factory::create();
 $browser = new Clue\React\Buzz\Browser($loop);
 
-$client = new Client($browser, $wsdl);
+$wsdl = '<?xml …';
+$options = array();
+
+$client = new Client($browser, $wsdl, $options);
 ```
 
 If you need custom DNS, TLS or proxy settings, you can explicitly pass a
@@ -142,6 +146,46 @@ try {
   error instead of throwing a `SoapFault`. It is not recommended to use this
   extension in production, so this should only ever affect test environments.
 
+The `Client` constructor accepts an array of options. All given options will
+be passed through to the underlying `SoapClient`. However, not all options
+make sense in this async implementation and as such may not have the desired
+effect. See also [`SoapClient`](http://php.net/manual/en/soapclient.soapclient.php)
+documentation for more details.
+
+If working in WSDL mode, the `$options` parameter is optional. If working in
+non-WSDL mode, the WSDL parameter must be set to `null` and the options
+parameter must contain the `location` and `uri` options, where `location` is
+the URL of the SOAP server to send the request to, and `uri` is the target
+namespace of the SOAP service:
+
+```php
+$client = new Client($browser, null, array(
+    'location' => 'http://example.com',
+    'uri' => 'http://ping.example.com',
+));
+```
+
+Similarly, if working in WSDL mode, the `location` option can be used to
+explicitly overwrite the URL of the SOAP server to send the request to:
+
+```php
+$client = new Client($browser, $wsdl, array(
+    'location' => 'http://example.com'
+));
+```
+
+You can use the `soap_version` option to change from the default SOAP 1.1 to
+use SOAP 1.2 instead:
+
+```php
+$client = new Client($browser, $wsdl, array(
+    'soap_version' => SOAP_1_2
+));
+```
+
+If you find an option is missing or not supported here, PRs are much
+appreciated!
+
 If you want to call RPC functions, see below for the [`Proxy`](#proxy) class.
 
 Note: It's recommended (and easier) to wrap the `Client` in a [`Proxy`](#proxy) instance.
@@ -166,19 +210,21 @@ $promise = $proxy->ping('hello', 42);
 
 #### getFunctions()
 
-The `getFunctions(): string[]` method can be used to
+The `getFunctions(): string[]|null` method can be used to
 return an array of functions defined in the WSDL.
 
 It returns the equivalent of PHP's 
 [`SoapClient::__getFunctions()`](http://php.net/manual/en/soapclient.getfunctions.php).
+In non-WSDL mode, this method returns `null`.
 
 #### getTypes()
 
-The `getTypes(): string[]` method can be used to
+The `getTypes(): string[]|null` method can be used to
 return an array of types defined in the WSDL.
 
 It returns the equivalent of PHP's
 [`SoapClient::__getTypes()`](http://php.net/manual/en/soapclient.gettypes.php).
+In non-WSDL mode, this method returns `null`.
 
 #### getLocation()
 
@@ -206,6 +252,10 @@ same location and accessing the first location is sufficient.
 ```php
 assert('http://example.com/soap/service' === $client->getLocation(0));
 ```
+
+When the `location` option has been set in the `Client` constructor
+(such as when in non-WSDL mode), this method returns the value of the
+given `location` option.
 
 Passing a `$function` not defined in the WSDL file will throw a `SoapFault`. 
 
