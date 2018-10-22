@@ -28,8 +28,10 @@ use React\Promise\PromiseInterface;
  * $client = new Client($browser, $wsdl, $options);
  * ```
  *
- * If you need custom DNS, TLS or proxy settings, you can explicitly pass a
- * custom [`Browser`](https://github.com/clue/reactphp-buzz#browser) instance:
+ * If you need custom connector settings (DNS resolution, TLS parameters, timeouts,
+ * proxy servers etc.), you can explicitly pass a custom instance of the
+ * [`ConnectorInterface`](https://github.com/reactphp/socket#connectorinterface)
+ * to the [`Browser`](https://github.com/clue/reactphp-buzz#browser) instance:
  *
  * ```php
  * $connector = new \React\Socket\Connector($loop, array(
@@ -59,7 +61,8 @@ use React\Promise\PromiseInterface;
  *     function (ResponseInterface $response) use ($browser) {
  *         // WSDL file is ready, create client
  *         $client = new Client($browser, (string)$response->getBody());
- *         …
+ *
+ *         // do something…
  *     },
  *     function (Exception $e) {
  *         // an error occured while trying to download the WSDL
@@ -79,7 +82,7 @@ use React\Promise\PromiseInterface;
  * }
  * ```
  *
- * > Note that if you have `ext-debug` loaded, this may halt with a fatal
+ * > Note that if you have `ext-xdebug` loaded, this may halt with a fatal
  *   error instead of throwing a `SoapFault`. It is not recommended to use this
  *   extension in production, so this should only ever affect test environments.
  *
@@ -131,13 +134,14 @@ use React\Promise\PromiseInterface;
  * ));
  * ```
  *
- * If you find an option is missing or not supported here, PRs are much
+ * The `proxy_host` option (and family) is not supported by this library. As an
+ * alternative, you can configure the given `$browser` instance to use an
+ * [HTTP proxy server](https://github.com/clue/reactphp-buzz#http-proxy).
+ * If you find any other option is missing or not supported here, PRs are much
  * appreciated!
  *
- * If you want to call RPC functions, see below for the [`Proxy`](#proxy) class.
- *
- * Note: It's recommended (and easier) to wrap the `Client` in a [`Proxy`](#proxy) instance.
  * All public methods of the `Client` are considered *advanced usage*.
+ * If you want to call RPC functions, see below for the [`Proxy`](#proxy) class.
  */
 final class Client
 {
