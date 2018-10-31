@@ -141,14 +141,34 @@ class FunctionalTest extends TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage cancelled
      */
-    public function testCancelMethodRejects()
+    public function testCancelMethodRejectsWithRuntimeException()
     {
         $api = new Proxy($this->client);
 
         $promise = $api->getBank(array('blz' => '12070000'));
         $promise->cancel();
+
+        Block\await($promise, $this->loop);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage timed out
+     */
+    public function testTimeoutRejectsWithRuntimeException()
+    {
+        $browser = new Browser($this->loop);
+        $browser = $browser->withOptions(array(
+            'timeout' => 0
+        ));
+
+        $this->client = new Client($browser, self::$wsdl);
+        $api = new Proxy($this->client);
+
+        $promise = $api->getBank(array('blz' => '12070000'));
 
         Block\await($promise, $this->loop);
     }
