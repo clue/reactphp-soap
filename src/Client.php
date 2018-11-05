@@ -156,6 +156,16 @@ final class Client
     {
         $wsdl = $wsdlContents !== null ? 'data://text/plain;base64,' . base64_encode($wsdlContents) : null;
 
+        // Accept HTTP responses with error status codes as valid responses.
+        // This is done in order to process these error responses through the normal SOAP decoder.
+        // Additionally, we explicitly limit number of redirects to zero because following redirects makes little sense
+        // because it transforms the POST request to a GET one and hence loses the SOAP request body.
+        $browser = $browser->withOptions(array(
+            'obeySuccessCode' => false,
+            'followRedirects' => true,
+            'maxRedirects' => 0
+        ));
+
         $this->browser = $browser;
         $this->encoder = new ClientEncoder($wsdl, $options);
         $this->decoder = new ClientDecoder($wsdl, $options);
@@ -199,7 +209,6 @@ final class Client
             }
         );
     }
-
 
     /**
      * Returns an array of functions defined in the WSDL.

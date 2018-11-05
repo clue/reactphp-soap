@@ -117,9 +117,27 @@ class FunctionalTest extends TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException RuntimeException
+     * @expectedExeptionMessage redirects
      */
-    public function testBlzServiceWithInvalidBlz()
+    public function testBlzServiceWithRedirectLocationRejectsWithRuntimeException()
+    {
+        $this->client = new Client(new Browser($this->loop), null, array(
+            'location' => 'http://httpbin.org/redirect-to?url=' . rawurlencode('http://www.thomas-bayer.com/axis2/services/BLZService'),
+            'uri' => 'http://thomas-bayer.com/blz/',
+        ));
+
+        $api = new Proxy($this->client);
+        $promise = $api->getBank('a');
+
+        $result = Block\await($promise, $this->loop);
+    }
+
+    /**
+     * @expectedException SoapFault
+     * @expectedExeptionMessage Keine Bank zur BLZ invalid gefunden!
+     */
+    public function testBlzServiceWithInvalidBlzRejectsWithSoapFault()
     {
         $api = new Proxy($this->client);
 
@@ -129,13 +147,14 @@ class FunctionalTest extends TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException SoapFault
+     * @expectedExceptionMessage Function ("doesNotExist") is not a valid method for this service
      */
-    public function testBlzServiceWithInvalidMethod()
+    public function testBlzServiceWithInvalidMethodRejectsWithSoapFault()
     {
         $api = new Proxy($this->client);
 
-        $promise = $api->doesNotexist();
+        $promise = $api->doesNotExist();
 
         Block\await($promise, $this->loop);
     }

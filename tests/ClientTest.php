@@ -45,6 +45,7 @@ class ClientTest extends TestCase
         };
         $promise = new Promise(function () { });
         $browser = $this->getMockBuilder('Clue\React\Buzz\Browser')->disableOriginalConstructor()->getMock();
+        $browser->expects($this->once())->method('withOptions')->willReturnSelf();
         $browser->expects($this->once())->method('send')->with($this->callback($verify))->willReturn($promise);
 
         $client = new Client($browser, null, array('location' => 'http://example.com', 'uri' => 'http://example.com/uri'));
