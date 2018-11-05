@@ -41,6 +41,7 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
     * [Functions](#functions)
     * [Promises](#promises)
     * [Cancellation](#cancellation)
+    * [Timeouts](#timeouts)
 * [Install](#install)
 * [Tests](#tests)
 * [License](#license)
@@ -324,6 +325,43 @@ $loop->addTimer(2.0, function () use ($promise) {
     $promise->cancel();
 });
 ```
+
+#### Timeouts
+
+This library uses a very efficient HTTP implementation, so most SOAP requests
+should usually be completed in mere milliseconds. However, when sending SOAP
+requests over an unreliable network (the internet), there are a number of things
+that can go wrong and may cause the request to fail after a time. As such,
+timeouts are handled by the underlying HTTP library and this library respects
+PHP's `default_socket_timeout` setting (default 60s) as a timeout for sending the
+outgoing SOAP request and waiting for a successful response and will otherwise
+cancel the pending request and reject its value with an Exception.
+
+Note that this timeout value covers creating the underlying transport connection,
+sending the SOAP request, waiting for the remote service to process the request
+and receiving the full SOAP response. To pass a custom timeout value, you can
+assign the underlying [`timeout` option](https://github.com/clue/reactphp-buzz#timeouts)
+like this:
+
+```php
+$browser = new Browser($loop);
+$browser = $browser->withOptions(array(
+    'timeout' => 10.0
+));
+
+$client = new Client($browser, $wsdl);
+$proxy = new Proxy($client);
+
+$proxy->demo()->then(function ($response) {
+    // response received within 10 seconds maximum
+    var_dump($response);
+});
+```
+
+Similarly, you can use a negative timeout value to not apply a timeout at all
+or use a `null` value to restore the default handling. Note that the underlying
+connection may still impose a different timeout value. See also the underlying
+[`timeout` option](https://github.com/clue/reactphp-buzz#timeouts) for more details.
 
 ## Install
 
