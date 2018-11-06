@@ -143,7 +143,7 @@ use React\Promise\PromiseInterface;
  * All public methods of the `Client` are considered *advanced usage*.
  * If you want to call RPC functions, see below for the [`Proxy`](#proxy) class.
  */
-final class Client
+class Client
 {
     private $browser;
     private $encoder;
