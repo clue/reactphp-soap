@@ -22,6 +22,12 @@ use React\Promise\PromiseInterface;
  *
  * Please refer to your WSDL or its accompanying documentation for details
  * on which functions and arguments are supported.
+ *
+ * > Note that this class is called "Proxy" because it will forward (proxy) all
+ *   method calls to the actual SOAP service via the underlying
+ *   [`Client::soapCall()`](#soapcall) method. This is not to be confused with
+ *   using a proxy server. See [`Client`](#client) documentation for more
+ *   details on how to use an HTTP proxy server.
  */
 final class Proxy
 {
