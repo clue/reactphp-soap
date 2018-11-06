@@ -268,8 +268,8 @@ class Client
      * ```
      *
      * When the `location` option has been set in the `Client` constructor
-     * (such as when in non-WSDL mode), this method returns the value of the
-     * given `location` option.
+     * (such as when in non-WSDL mode) or via the `withLocation()` method, this
+     * method returns the value of the given location.
      *
      * Passing a `$function` not defined in the WSDL file will throw a `SoapFault`.
      *
@@ -289,5 +289,35 @@ class Client
 
         // encode request for given $function
         return (string)$this->encoder->encode($function, array())->getUri();
+    }
+
+    /**
+     * Returns a new `Client` with the updated location (URI) for all functions.
+     *
+     * Note that this is not to be confused with the WSDL file location.
+     * A WSDL file can contain any number of function definitions.
+     * It's very common that all of these functions use the same location definition.
+     * However, technically each function can potentially use a different location.
+     *
+     * ```php
+     * $client = $client->withLocation('http://example.com/soap');
+     *
+     * assert('http://example.com/soap' === $client->getLocation('echo'));
+     * ```
+     *
+     * As an alternative to this method, you can also set the `location` option
+     * in the `Client` constructor (such as when in non-WSDL mode).
+     *
+     * @param string $location
+     * @return self
+     * @see self::getLocation()
+     */
+    public function withLocation($location)
+    {
+        $client = clone $this;
+        $client->encoder = clone $this->encoder;
+        $client->encoder->__setLocation($location);
+
+        return $client;
     }
 }
