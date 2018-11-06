@@ -37,6 +37,7 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
     * [getFunctions()](#getfunctions)
     * [getTypes()](#gettypes)
     * [getLocation()](#getlocation)
+    * [withLocation()](#withlocation)
   * [Proxy](#proxy)
     * [Functions](#functions)
     * [Promises](#promises)
@@ -270,10 +271,29 @@ assert('http://example.com/soap/service' === $client->getLocation(0));
 ```
 
 When the `location` option has been set in the `Client` constructor
-(such as when in non-WSDL mode), this method returns the value of the
-given `location` option.
+(such as when in non-WSDL mode) or via the `withLocation()` method, this
+method returns the value of the given location.
 
-Passing a `$function` not defined in the WSDL file will throw a `SoapFault`. 
+Passing a `$function` not defined in the WSDL file will throw a `SoapFault`.
+
+#### withLocation()
+
+The `withLocation(string $location): self` method can be used to
+return a new `Client` with the updated location (URI) for all functions.
+
+Note that this is not to be confused with the WSDL file location.
+A WSDL file can contain any number of function definitions.
+It's very common that all of these functions use the same location definition.
+However, technically each function can potentially use a different location.
+
+```php
+$client = $client->withLocation('http://example.com/soap');
+
+assert('http://example.com/soap' === $client->getLocation('echo'));
+```
+
+As an alternative to this method, you can also set the `location` option
+in the `Client` constructor (such as when in non-WSDL mode).
 
 ### Proxy
 

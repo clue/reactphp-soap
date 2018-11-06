@@ -227,4 +227,38 @@ class FunctionalTest extends TestCase
 
         $this->assertEquals('http://example.com/', $this->client->getLocation(0));
     }
+
+    public function testWithLocationReturnsUpdatedClient()
+    {
+        $original = $this->client->getLocation(0);
+        $client = $this->client->withLocation('http://nonsense.invalid');
+
+        $this->assertEquals('http://nonsense.invalid', $client->getLocation(0));
+        $this->assertEquals($original, $this->client->getLocation(0));
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testWithLocationInvalidRejectsWithRuntimeException()
+    {
+        $api = new Proxy($this->client->withLocation('http://nonsense.invalid'));
+
+        $promise = $api->getBank(array('blz' => '12070000'));
+
+        Block\await($promise, $this->loop);
+    }
+
+    public function testWithLocationRestoredToOriginalResolves()
+    {
+        $original = $this->client->getLocation(0);
+        $client = $this->client->withLocation('http://nonsense.invalid');
+        $client = $client->withLocation($original);
+        $api = new Proxy($client);
+
+        $promise = $api->getBank(array('blz' => '12070000'));
+
+        $result = Block\await($promise, $this->loop);
+        $this->assertInternalType('object', $result);
+    }
 }
