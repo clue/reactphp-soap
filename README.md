@@ -1,10 +1,10 @@
 # clue/reactphp-soap [![Build Status](https://travis-ci.org/clue/reactphp-soap.svg?branch=master)](https://travis-ci.org/clue/reactphp-soap)
 
-Simple, async [SOAP](http://en.wikipedia.org/wiki/SOAP) web service client library,
+Simple, async [SOAP](https://en.wikipedia.org/wiki/SOAP) web service client library,
 built on top of [ReactPHP](https://reactphp.org/).
 
 Most notably, SOAP is often used for invoking
-[Remote procedure calls](http://en.wikipedia.org/wiki/Remote_procedure_call) (RPCs)
+[Remote procedure calls](https://en.wikipedia.org/wiki/Remote_procedure_call) (RPCs)
 in distributed systems.
 Internally, SOAP messages are encoded as XML and usually sent via HTTP POST requests.
 For the most part, SOAP (originally *Simple Object Access protocol*) is a protocol of the past,
@@ -22,11 +22,11 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
 * **Event-driven core** -
   Internally, everything uses event handlers to react to incoming events, such as an incoming RPC result.
 * **Lightweight, SOLID design** -
-  Provides a thin abstraction that is [*just good enough*](http://en.wikipedia.org/wiki/Principle_of_good_enough)
+  Provides a thin abstraction that is [*just good enough*](https://en.wikipedia.org/wiki/Principle_of_good_enough)
   and does not get in your way.
   Built on top of tested components instead of re-inventing the wheel.
 * **Good test coverage** -
-  Comes with an automated tests suite and is regularly tested against actual web services in the wild
+  Comes with an automated tests suite and is regularly tested against actual web services in the wild.
 
 **Table of contents**
 
@@ -398,10 +398,11 @@ connection may still impose a different timeout value. See also the underlying
 The recommended way to install this library is [through Composer](https://getcomposer.org).
 [New to Composer?](https://getcomposer.org/doc/00-intro.md)
 
+This project follows [SemVer](https://semver.org/).
 This will install the latest supported version:
 
 ```bash
-$ composer require clue/soap-react:^0.2
+$ composer require clue/soap-react:^1.0
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
@@ -435,4 +436,7 @@ $ php vendor/bin/phpunit --exclude-group internet
 
 ## License
 
-MIT
+This project is released under the permissive [MIT license](LICENSE).
+
+> Did you know that I offer custom development services and issuing invoices for
+  sponsorships of releases and for contributions? Contact me (@clue) for details.
