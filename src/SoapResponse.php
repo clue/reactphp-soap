@@ -13,6 +13,12 @@ class SoapResponse
     /** @var string|null */
     private $content;
 
+    /** @var string|null */
+    private $method;
+
+    /** @var mixed[] */
+    private $params;
+
     /**
      * @return string|null
      */
@@ -69,6 +75,46 @@ class SoapResponse
     public function setContent($content)
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * @param string|null $method
+     *
+     * @return SoapResponse
+     */
+    public function setMethod($method)
+    {
+        $this->method = $method;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    /**
+     * @param mixed[] $params
+     *
+     * @return SoapResponse
+     */
+    public function setParams($params)
+    {
+        $this->params = $params;
 
         return $this;
     }

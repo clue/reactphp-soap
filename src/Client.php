@@ -205,7 +205,9 @@ class Client
         }
 
         $callObject = new SoapResponse();
-        $callObject->setRequest((string)$request->getBody());
+        $callObject->setRequest((string)$request->getBody())
+            ->setMethod($name)
+            ->setParams($args);
 
         $decoder = $this->decoder;
 
