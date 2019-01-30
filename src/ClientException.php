@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: fer
- * Date: 2019-01-30
- * Time: 15:43
- */
 
 namespace Clue\React\Soap;
 
@@ -61,6 +55,26 @@ class ClientException extends \SoapFault
     public function setResponse($response)
     {
         $this->response = $response;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * @param null $method
+     *
+     * @return ClientException
+     */
+    public function setMethod($method)
+    {
+        $this->method = $method;
 
         return $this;
     }
