@@ -218,7 +218,14 @@ class Client
                         $decoder->decode($name, (string)$response->getBody(), $callObject)
                     );
                 } catch (\SoapFault $e) {
-                    throw new ClientException($e->getMessage(), $e->getCode(), $e, $callObject->getRequest(), $callObject->getResponse());
+                    throw new ClientException(
+                        $e->getMessage(),
+                        $e->getCode(),
+                        $e,
+                        $name,
+                        $callObject->getRequest(),
+                        $callObject->getResponse()
+                    );
                 }
             }
         );

@@ -14,11 +14,13 @@ class ClientException extends \SoapFault
 {
     protected $request;
     protected $response;
+    protected $method;
 
-    public function __construct($message = "", $code = 0, Throwable $previous = null, $request = null, $response = null)
+    public function __construct($message = "", $code = 0, Throwable $previous = null, $method = null, $request = null, $response = null)
     {
         parent::__construct($message, $code, $previous);
 
+        $this->method = $method;
         $this->request = $request;
         $this->response = $response;
     }
