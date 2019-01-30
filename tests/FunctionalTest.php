@@ -48,6 +48,7 @@ class FunctionalTest extends TestCase
         $promise = $api->getBank(array('blz' => '12070000'));
 
         $result = Block\await($promise, $this->loop);
+        $result = $result->getContent();
 
         $this->assertInternalType('object', $result);
         $this->assertTrue(isset($result->details));
@@ -70,6 +71,7 @@ class FunctionalTest extends TestCase
         $promise = $api->getBank(array('blz' => '12070000'));
 
         $result = Block\await($promise, $this->loop);
+        $result = $result->getContent();
 
         $this->assertInstanceOf('BankResponse', $result);
         $this->assertTrue(isset($result->details));
@@ -90,6 +92,7 @@ class FunctionalTest extends TestCase
         $promise = $api->getBank(array('blz' => '12070000'));
 
         $result = Block\await($promise, $this->loop);
+        $result = $result->getContent();
 
         $this->assertInternalType('object', $result);
         $this->assertTrue(isset($result->details));
@@ -110,6 +113,7 @@ class FunctionalTest extends TestCase
         $promise = $api->getBank(new SoapVar('12070000', XSD_STRING, null, null, 'blz', 'http://thomas-bayer.com/blz/'));
 
         $result = Block\await($promise, $this->loop);
+        $result = $result->getContent();
 
         $this->assertInternalType('object', $result);
         $this->assertFalse(isset($result->details));

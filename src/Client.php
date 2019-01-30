@@ -204,12 +204,16 @@ class Client
             return $deferred->promise();
         }
 
+        $callObject = new SoapResponse();
+        $callObject->setRequest($request);
+
         $decoder = $this->decoder;
 
         return $this->browser->send($request)->then(
-            function (ResponseInterface $response) use ($decoder, $name) {
+            function (ResponseInterface $response) use ($decoder, $name, $callObject) {
                 // HTTP response received => decode results for this function call
-                return $decoder->decode($name, (string)$response->getBody());
+                return $callObject->setResponse($response)
+                    ->setContent($decoder->decode($name, (string)$response->getBody()));
             }
         );
     }
