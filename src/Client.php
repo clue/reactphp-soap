@@ -205,15 +205,21 @@ class Client
         }
 
         $callObject = new SoapResponse();
-        $callObject->setRequest($request);
+        $callObject->setRequest((string)$request->getBody());
 
         $decoder = $this->decoder;
 
         return $this->browser->send($request)->then(
             function (ResponseInterface $response) use ($decoder, $name, $callObject) {
                 // HTTP response received => decode results for this function call
-                return $callObject->setResponse($response)
-                    ->setContent($decoder->decode($name, (string)$response->getBody()));
+                $callObject->setResponse((string)$response->getBody());
+                try {
+                    return $callObject->setContent(
+                        $decoder->decode($name, (string)$response->getBody(), $callObject)
+                    );
+                } catch (\SoapFault $e) {
+                    throw new ClientException($e->getMessage(), $e->getCode(), $e, $callObject->getRequest(), $callObject->getResponse());
+                }
             }
         );
     }

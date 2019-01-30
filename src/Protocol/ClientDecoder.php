@@ -2,6 +2,7 @@
 
 namespace Clue\React\Soap\Protocol;
 
+use Clue\React\Soap\SoapResponse;
 use \SoapClient;
 
 /**
