@@ -15,12 +15,9 @@ class ClientException extends \SoapFault
         parent::__construct($message, $code, $previous);
 
         if ($previous instanceof \SoapFault) {
-            $this->faultstring = $previous->faultstring;
-            $this->faultcode = $previous->faultcode;
-            $this->faultactor = $previous->faultactor;
-            $this->detail = $previous->detail;
-            $this->faultname = $previous->faultname;
-            $this->headerfault = $previous->headerfault;
+            $this->faultstring = isset($previous->faultstring) ? $previous->faultstring : null;
+            $this->faultcode = isset($previous->faultcode) ? $previous->faultcode : null;
+            $this->detail = isset($previous->detail) ? $previous->detail : null;
         }
 
         $this->method = $method;
