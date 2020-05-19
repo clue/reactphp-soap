@@ -9,6 +9,10 @@ use Psr\Http\Message\RequestInterface;
 
 class ClientTest extends TestCase
 {
+
+    /**
+     * @expectedException SoapFault
+     */
     public function testConstructorThrowsWhenUrlIsInvalid()
     {
         if (extension_loaded('xdebug')) {
