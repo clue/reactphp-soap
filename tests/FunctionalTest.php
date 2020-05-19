@@ -1,5 +1,7 @@
 <?php
 
+namespace Clue\Tests\React\Soap;
+
 use Clue\React\Block;
 use Clue\React\Buzz\Browser;
 use Clue\React\Soap\Client;
@@ -16,7 +18,7 @@ class BankResponse
 class FunctionalTest extends TestCase
 {
     /**
-     * @var React\EventLoop\LoopInterface
+     * @var \React\EventLoop\LoopInterface
      */
     private $loop;
 
@@ -34,7 +36,7 @@ class FunctionalTest extends TestCase
 
     public function setUp()
     {
-        $this->loop = React\EventLoop\Factory::create();
+        $this->loop = \React\EventLoop\Factory::create();
         $this->client = new Client(new Browser($this->loop), self::$wsdl);
     }
 
@@ -58,7 +60,7 @@ class FunctionalTest extends TestCase
     {
         $this->client = new Client(new Browser($this->loop), self::$wsdl, array(
             'classmap' => array(
-                'getBankResponseType' => 'BankResponse'
+                'getBankResponseType' => 'Clue\Tests\React\Soap\BankResponse'
             )
         ));
 
@@ -71,7 +73,7 @@ class FunctionalTest extends TestCase
 
         $result = Block\await($promise, $this->loop);
 
-        $this->assertInstanceOf('BankResponse', $result);
+        $this->assertInstanceOf('Clue\Tests\React\Soap\BankResponse', $result);
         $this->assertTrue(isset($result->details));
         $this->assertTrue(isset($result->details->bic));
     }
@@ -107,7 +109,7 @@ class FunctionalTest extends TestCase
 
         // try encoding the "blz" parameter with the correct namespace (see uri)
         // $promise = $api->getBank(new SoapParam('12070000', 'ns1:blz'));
-        $promise = $api->getBank(new SoapVar('12070000', XSD_STRING, null, null, 'blz', 'http://thomas-bayer.com/blz/'));
+        $promise = $api->getBank(new \SoapVar('12070000', XSD_STRING, null, null, 'blz', 'http://thomas-bayer.com/blz/'));
 
         $result = Block\await($promise, $this->loop);
 

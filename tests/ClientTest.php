@@ -1,5 +1,7 @@
 <?php
 
+namespace Clue\Tests\React\Soap;
+
 use Clue\React\Soap\Client;
 use PHPUnit\Framework\TestCase;
 use React\Promise\Promise;
