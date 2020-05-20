@@ -13,6 +13,9 @@
     "autoload": {
         "psr-4": { "Clue\\React\\Soap\\": "src/" }
     },
+    "autoload-dev": {
+        "psr-4": { "Clue\\Tests\\React\\Soap\\": "tests/" }
+    },
     "require": {
         "php": ">=5.3",
         "clue/buzz-react": "^2.5",
@@ -22,6 +25,6 @@
     },
     "require-dev": {
         "clue/block-react": "^1.0",
-        "phpunit/phpunit": "^6.4 || ^5.7 || ^4.8.35"
+        "phpunit/phpunit": "^7.0 || ^6.4 || ^5.7 || ^4.8.35"
     }
 }

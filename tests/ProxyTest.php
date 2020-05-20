@@ -1,5 +1,7 @@
 <?php
 
+namespace Clue\Tests\React\Soap;
+
 use PHPUnit\Framework\TestCase;
 use Clue\React\Soap\Proxy;
 
