@@ -127,7 +127,7 @@ class FunctionalTest extends TestCase
     public function testBlzServiceWithRedirectLocationRejectsWithRuntimeException()
     {
         $this->client = new Client(new Browser($this->loop), null, array(
-            'location' => 'http://httpbin.org/redirect-to?url=' . rawurlencode('http://www.thomas-bayer.com/axis2/services/BLZService'),
+            'location' => 'http://httpbingo.org/redirect-to?url=' . rawurlencode('http://www.thomas-bayer.com/axis2/services/BLZService'),
             'uri' => 'http://thomas-bayer.com/blz/',
         ));
 
