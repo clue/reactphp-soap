@@ -29,12 +29,18 @@ class FunctionalTest extends TestCase
 
     // download WSDL file only once for all test cases
     private static $wsdl;
-    public static function setUpBeforeClass()
+    /**
+     * @beforeClass
+     */
+    public static function setUpFileBeforeClass()
     {
         self::$wsdl = file_get_contents('http://www.thomas-bayer.com/axis2/services/BLZService?wsdl');
     }
 
-    public function setUp()
+    /**
+     * @before
+     */
+    public function setUpClient()
     {
         $this->loop = \React\EventLoop\Factory::create();
         $this->client = new Client(new Browser($this->loop), self::$wsdl);
@@ -51,7 +57,7 @@ class FunctionalTest extends TestCase
 
         $result = Block\await($promise, $this->loop);
 
-        $this->assertInternalType('object', $result);
+        $this->assertIsTypeObject($result);
         $this->assertTrue(isset($result->details));
         $this->assertTrue(isset($result->details->bic));
     }
@@ -93,7 +99,7 @@ class FunctionalTest extends TestCase
 
         $result = Block\await($promise, $this->loop);
 
-        $this->assertInternalType('object', $result);
+        $this->assertIsTypeObject($result);
         $this->assertTrue(isset($result->details));
         $this->assertTrue(isset($result->details->bic));
     }
@@ -113,58 +119,45 @@ class FunctionalTest extends TestCase
 
         $result = Block\await($promise, $this->loop);
 
-        $this->assertInternalType('object', $result);
+        $this->assertIsTypeObject($result);
         $this->assertFalse(isset($result->details));
         $this->assertTrue(isset($result->bic));
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExeptionMessage redirects
-     */
     public function testBlzServiceWithRedirectLocationRejectsWithRuntimeException()
     {
         $this->client = new Client(new Browser($this->loop), null, array(
-            'location' => 'http://httpbin.org/redirect-to?url=' . rawurlencode('http://www.thomas-bayer.com/axis2/services/BLZService'),
+            'location' => 'http://httpbingo.org/redirect-to?url=' . rawurlencode('http://www.thomas-bayer.com/axis2/services/BLZService'),
             'uri' => 'http://thomas-bayer.com/blz/',
         ));
 
         $api = new Proxy($this->client);
         $promise = $api->getBank('a');
 
+        $this->setExpectedException('RuntimeException', 'redirects');
         $result = Block\await($promise, $this->loop);
     }
 
-    /**
-     * @expectedException SoapFault
-     * @expectedExeptionMessage Keine Bank zur BLZ invalid gefunden!
-     */
     public function testBlzServiceWithInvalidBlzRejectsWithSoapFault()
     {
         $api = new Proxy($this->client);
 
         $promise = $api->getBank(array('blz' => 'invalid'));
 
+        $this->setExpectedException('SoapFault', 'Keine Bank zur BLZ invalid gefunden!');
         Block\await($promise, $this->loop);
     }
 
-    /**
-     * @expectedException SoapFault
-     * @expectedExceptionMessage Function ("doesNotExist") is not a valid method for this service
-     */
     public function testBlzServiceWithInvalidMethodRejectsWithSoapFault()
     {
         $api = new Proxy($this->client);
 
         $promise = $api->doesNotExist();
 
+        $this->setExpectedException('SoapFault', 'Function ("doesNotExist") is not a valid method for this service');
         Block\await($promise, $this->loop);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage cancelled
-     */
     public function testCancelMethodRejectsWithRuntimeException()
     {
         $api = new Proxy($this->client);
@@ -172,13 +165,10 @@ class FunctionalTest extends TestCase
         $promise = $api->getBank(array('blz' => '12070000'));
         $promise->cancel();
 
+        $this->setExpectedException('RuntimeException', 'cancelled');
         Block\await($promise, $this->loop);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage timed out
-     */
     public function testTimeoutRejectsWithRuntimeException()
     {
         $browser = new Browser($this->loop);
@@ -191,6 +181,7 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
+        $this->setExpectedException('RuntimeException', 'timed out');
         Block\await($promise, $this->loop);
     }
 
@@ -205,19 +196,15 @@ class FunctionalTest extends TestCase
         $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation(0));
     }
 
-    /**
-     * @expectedException SoapFault
-     */
     public function testGetLocationOfUnknownFunctionNameFails()
     {
+        $this->setExpectedException('SoapFault');
         $this->client->getLocation('unknown');
     }
 
-    /**
-     * @expectedException SoapFault
-     */
     public function testGetLocationForUnknownFunctionNumberFails()
     {
+        $this->setExpectedException('SoapFault');
         $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation(100));
     }
 
@@ -239,15 +226,13 @@ class FunctionalTest extends TestCase
         $this->assertEquals($original, $this->client->getLocation(0));
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testWithLocationInvalidRejectsWithRuntimeException()
     {
         $api = new Proxy($this->client->withLocation('http://nonsense.invalid'));
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
+        $this->setExpectedException('RuntimeException');
         Block\await($promise, $this->loop);
     }
 
@@ -261,6 +246,34 @@ class FunctionalTest extends TestCase
         $promise = $api->getBank(array('blz' => '12070000'));
 
         $result = Block\await($promise, $this->loop);
-        $this->assertInternalType('object', $result);
+        $this->assertIsTypeObject($result);
+    }
+
+    public function assertIsTypeObject($actual)
+    {
+        if (method_exists($this, 'assertInternalType')) {
+            // legacy PHPUnit 4 - PHPUnit 7.5
+            $this->assertInternalType('object', $actual);
+        } else {
+            // PHPUnit 7.5+
+            $this->assertIsObject($actual);
+        }
+    }
+
+    public function setExpectedException($exception, $exceptionMessage = '', $exceptionCode = null)
+    {
+        if (method_exists($this, 'expectException')) {
+            // PHPUnit 5+
+            $this->expectException($exception);
+            if ($exceptionMessage !== '') {
+                $this->expectExceptionMessage($exceptionMessage);
+            }
+            if ($exceptionCode !== null) {
+                $this->expectExceptionCode($exceptionCode);
+            }
+        } else {
+            // legacy PHPUnit 4
+            parent::setExpectedException($exception, $exceptionMessage, $exceptionCode);
+        }
     }
 }

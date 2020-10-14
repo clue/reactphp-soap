@@ -5,12 +5,10 @@ use PHPUnit\Framework\TestCase;
 
 class ClientDecoderTest extends TestCase
 {
-    /**
-     * @expectedException SoapFault
-     */
     public function testDecodeThrowsSoapFaultForInvalidResponse()
     {
         $decoder = new ClientDecoder(null, array('location' => '1', 'uri' => '2'));
+        $this->setExpectedException('SoapFault');
         $decoder->decode('anything', 'invalid');
     }
 
@@ -31,5 +29,22 @@ SOAP
         $expected->plz = '14405';
 
         $this->assertEquals($expected, $res);
+    }
+
+    public function setExpectedException($exception, $exceptionMessage = '', $exceptionCode = null)
+    {
+        if (method_exists($this, 'expectException')) {
+            // PHPUnit 5+
+            $this->expectException($exception);
+            if ($exceptionMessage !== '') {
+                $this->expectExceptionMessage($exceptionMessage);
+            }
+            if ($exceptionCode !== null) {
+                $this->expectExceptionCode($exceptionCode);
+            }
+        } else {
+            // legacy PHPUnit 4
+            parent::setExpectedException($exception, $exceptionMessage, $exceptionCode);
+        }
     }
 }
