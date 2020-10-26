@@ -18,7 +18,7 @@ class ClientTest extends TestCase
             $this->markTestSkipped('Invalid WSDL causes a fatal error when ext-xdebug is loaded');
         }
 
-        $browser = $this->getMockBuilder('Clue\React\Buzz\Browser')->disableOriginalConstructor()->getMock();
+        $browser = $this->getMockBuilder('React\Http\Browser')->disableOriginalConstructor()->getMock();
         $wsdl = 'invalid';
 
         $client = new Client($browser, $wsdl);
@@ -26,7 +26,7 @@ class ClientTest extends TestCase
 
     public function testNonWsdlClientReturnsSameLocationOptionForAnyFunction()
     {
-        $browser = $this->getMockBuilder('Clue\React\Buzz\Browser')->disableOriginalConstructor()->getMock();
+        $browser = $this->getMockBuilder('React\Http\Browser')->disableOriginalConstructor()->getMock();
 
         $browser->expects($this->once())->method('withRejectErrorResponse')->willReturnSelf();
         $browser->expects($this->once())->method('withFollowRedirects')->willReturnSelf();
@@ -38,7 +38,7 @@ class ClientTest extends TestCase
 
     public function testNonWsdlClientReturnsNoTypesAndFunctions()
     {
-        $browser = $this->getMockBuilder('Clue\React\Buzz\Browser')->disableOriginalConstructor()->getMock();
+        $browser = $this->getMockBuilder('React\Http\Browser')->disableOriginalConstructor()->getMock();
 
         $browser->expects($this->once())->method('withRejectErrorResponse')->willReturnSelf();
         $browser->expects($this->once())->method('withFollowRedirects')->willReturnSelf();
@@ -52,7 +52,7 @@ class ClientTest extends TestCase
     public function testNonWsdlClientSendsPostRequestToGivenLocationForAnySoapCall()
     {
         $promise = new Promise(function () { });
-        $browser = $this->getMockBuilder('Clue\React\Buzz\Browser')->disableOriginalConstructor()->getMock();
+        $browser = $this->getMockBuilder('React\Http\Browser')->disableOriginalConstructor()->getMock();
         $browser->expects($this->once())->method('withRejectErrorResponse')->willReturnSelf();
         $browser->expects($this->once())->method('withFollowRedirects')->willReturnSelf();
         $browser->expects($this->once())->method('request')->with('POST', 'http://example.com')->willReturn($promise);

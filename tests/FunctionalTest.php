@@ -3,10 +3,10 @@
 namespace Clue\Tests\React\Soap;
 
 use Clue\React\Block;
-use Clue\React\Buzz\Browser;
 use Clue\React\Soap\Client;
 use Clue\React\Soap\Proxy;
 use PHPUnit\Framework\TestCase;
+use React\Http\Browser;
 
 class BankResponse
 {

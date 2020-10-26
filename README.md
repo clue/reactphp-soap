@@ -78,14 +78,14 @@ See also the [examples](examples).
 The `Client` class is responsible for communication with the remote SOAP
 WebService server.
 
-It requires a [`Browser`](https://github.com/clue/reactphp-buzz#browser) object
+It requires a [`Browser`](https://github.com/reactphp/http#browser) object
 bound to the main [`EventLoop`](https://github.com/reactphp/event-loop#usage)
 in order to handle async requests, the WSDL file contents and an optional
 array of SOAP options:
 
 ```php
 $loop = React\EventLoop\Factory::create();
-$browser = new Clue\React\Buzz\Browser($loop);
+$browser = new React\Http\Browser($loop);
 
 $wsdl = '<?xml …';
 $options = array();
@@ -96,7 +96,7 @@ $client = new Client($browser, $wsdl, $options);
 If you need custom connector settings (DNS resolution, TLS parameters, timeouts,
 proxy servers etc.), you can explicitly pass a custom instance of the
 [`ConnectorInterface`](https://github.com/reactphp/socket#connectorinterface)
-to the [`Browser`](https://github.com/clue/reactphp-buzz#browser) instance:
+to the [`Browser`](https://github.com/reactphp/http#browser) instance:
 
 ```php
 $connector = new \React\Socket\Connector($loop, array(
@@ -201,7 +201,7 @@ $client = new Client($browser, $wsdl, array(
 
 The `proxy_host` option (and family) is not supported by this library. As an
 alternative, you can configure the given `$browser` instance to use an
-[HTTP proxy server](https://github.com/clue/reactphp-buzz#http-proxy).
+[HTTP proxy server](https://github.com/reactphp/http#http-proxy).
 If you find any other option is missing or not supported here, PRs are much
 appreciated!
 
@@ -370,7 +370,7 @@ cancel the pending request and reject its value with an Exception.
 Note that this timeout value covers creating the underlying transport connection,
 sending the SOAP request, waiting for the remote service to process the request
 and receiving the full SOAP response. To pass a custom timeout value, you can
-assign the underlying [`timeout` option](https://github.com/clue/reactphp-buzz#timeouts)
+assign the underlying [`timeout` option](https://github.com/clue/reactphp/http#timeouts)
 like this:
 
 ```php
@@ -391,7 +391,7 @@ $proxy->demo()->then(function ($response) {
 Similarly, you can use a negative timeout value to not apply a timeout at all
 or use a `null` value to restore the default handling. Note that the underlying
 connection may still impose a different timeout value. See also the underlying
-[`timeout` option](https://github.com/clue/reactphp-buzz#timeouts) for more details.
+[`timeout` option](https://github.com/clue/reactphp/http#timeouts) for more details.
 
 ## Install
 
