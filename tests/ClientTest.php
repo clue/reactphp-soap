@@ -5,7 +5,6 @@ namespace Clue\Tests\React\Soap;
 use Clue\React\Soap\Client;
 use PHPUnit\Framework\TestCase;
 use React\Promise\Promise;
-use Psr\Http\Message\RequestInterface;
 
 class ClientTest extends TestCase
 {
@@ -29,6 +28,9 @@ class ClientTest extends TestCase
     {
         $browser = $this->getMockBuilder('Clue\React\Buzz\Browser')->disableOriginalConstructor()->getMock();
 
+        $browser->expects($this->once())->method('withRejectErrorResponse')->willReturnSelf();
+        $browser->expects($this->once())->method('withFollowRedirects')->willReturnSelf();
+
         $client = new Client($browser, null, array('location' => 'http://example.com', 'uri' => 'http://example.com/uri'));
 
         $this->assertEquals('http://example.com', $client->getLocation('anything'));
@@ -38,6 +40,9 @@ class ClientTest extends TestCase
     {
         $browser = $this->getMockBuilder('Clue\React\Buzz\Browser')->disableOriginalConstructor()->getMock();
 
+        $browser->expects($this->once())->method('withRejectErrorResponse')->willReturnSelf();
+        $browser->expects($this->once())->method('withFollowRedirects')->willReturnSelf();
+
         $client = new Client($browser, null, array('location' => 'http://example.com', 'uri' => 'http://example.com/uri'));
 
         $this->assertNull($client->getTypes());
@@ -46,13 +51,11 @@ class ClientTest extends TestCase
 
     public function testNonWsdlClientSendsPostRequestToGivenLocationForAnySoapCall()
     {
-        $verify = function (RequestInterface $request) {
-            return ($request->getMethod() === 'POST' && (string)$request->getUri() === 'http://example.com');
-        };
         $promise = new Promise(function () { });
         $browser = $this->getMockBuilder('Clue\React\Buzz\Browser')->disableOriginalConstructor()->getMock();
-        $browser->expects($this->once())->method('withOptions')->willReturnSelf();
-        $browser->expects($this->once())->method('send')->with($this->callback($verify))->willReturn($promise);
+        $browser->expects($this->once())->method('withRejectErrorResponse')->willReturnSelf();
+        $browser->expects($this->once())->method('withFollowRedirects')->willReturnSelf();
+        $browser->expects($this->once())->method('request')->with('POST', 'http://example.com')->willReturn($promise);
 
         $client = new Client($browser, null, array('location' => 'http://example.com', 'uri' => 'http://example.com/uri'));
 

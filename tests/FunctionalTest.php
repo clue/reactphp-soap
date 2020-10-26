@@ -172,9 +172,7 @@ class FunctionalTest extends TestCase
     public function testTimeoutRejectsWithRuntimeException()
     {
         $browser = new Browser($this->loop);
-        $browser = $browser->withOptions(array(
-            'timeout' => 0
-        ));
+        $browser = $browser->withTimeout(0);
 
         $this->client = new Client($browser, self::$wsdl);
         $api = new Proxy($this->client);

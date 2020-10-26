@@ -164,11 +164,8 @@ class Client
         // This is done in order to process these error responses through the normal SOAP decoder.
         // Additionally, we explicitly limit number of redirects to zero because following redirects makes little sense
         // because it transforms the POST request to a GET one and hence loses the SOAP request body.
-        $browser = $browser->withOptions(array(
-            'obeySuccessCode' => false,
-            'followRedirects' => true,
-            'maxRedirects' => 0
-        ));
+        $browser = $browser->withRejectErrorResponse(false);
+        $browser = $browser->withFollowRedirects(0);
 
         $this->browser = $browser;
         $this->encoder = new ClientEncoder($wsdl, $options);
@@ -206,7 +203,12 @@ class Client
 
         $decoder = $this->decoder;
 
-        return $this->browser->send($request)->then(
+        return $this->browser->request(
+            $request->getMethod(),
+            (string) $request->getUri(),
+            $request->getHeaders(),
+            (string) $request->getBody()
+        )->then(
             function (ResponseInterface $response) use ($decoder, $name) {
                 // HTTP response received => decode results for this function call
                 return $decoder->decode($name, (string)$response->getBody());
