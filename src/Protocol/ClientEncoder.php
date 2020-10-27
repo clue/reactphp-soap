@@ -17,7 +17,7 @@ final class ClientEncoder extends SoapClient
      *
      * @param string $name
      * @param array $args
-     * @return Request
+     * @return \Psr\Http\Message\RequestInterface
      * @throws \SoapFault if request is invalid according to WSDL
      */
     public function encode($name, $args)

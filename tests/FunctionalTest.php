@@ -3,10 +3,10 @@
 namespace Clue\Tests\React\Soap;
 
 use Clue\React\Block;
-use Clue\React\Buzz\Browser;
 use Clue\React\Soap\Client;
 use Clue\React\Soap\Proxy;
 use PHPUnit\Framework\TestCase;
+use React\Http\Browser;
 
 class BankResponse
 {
@@ -172,9 +172,7 @@ class FunctionalTest extends TestCase
     public function testTimeoutRejectsWithRuntimeException()
     {
         $browser = new Browser($this->loop);
-        $browser = $browser->withOptions(array(
-            'timeout' => 0
-        ));
+        $browser = $browser->withTimeout(0);
 
         $this->client = new Client($browser, self::$wsdl);
         $api = new Proxy($this->client);

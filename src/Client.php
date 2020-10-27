@@ -2,10 +2,10 @@
 
 namespace Clue\React\Soap;
 
-use Clue\React\Buzz\Browser;
 use Clue\React\Soap\Protocol\ClientDecoder;
 use Clue\React\Soap\Protocol\ClientEncoder;
 use Psr\Http\Message\ResponseInterface;
+use React\Http\Browser;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 
@@ -13,14 +13,14 @@ use React\Promise\PromiseInterface;
  * The `Client` class is responsible for communication with the remote SOAP
  * WebService server.
  *
- * It requires a [`Browser`](https://github.com/clue/reactphp-buzz#browser) object
+ * It requires a [`Browser`](https://github.com/reactphp/http#browser) object
  * bound to the main [`EventLoop`](https://github.com/reactphp/event-loop#usage)
  * in order to handle async requests, the WSDL file contents and an optional
  * array of SOAP options:
  *
  * ```php
  * $loop = React\EventLoop\Factory::create();
- * $browser = new Clue\React\Buzz\Browser($loop);
+ * $browser = new React\Http\Browser($loop);
  *
  * $wsdl = '<?xml …';
  * $options = array();
@@ -31,7 +31,7 @@ use React\Promise\PromiseInterface;
  * If you need custom connector settings (DNS resolution, TLS parameters, timeouts,
  * proxy servers etc.), you can explicitly pass a custom instance of the
  * [`ConnectorInterface`](https://github.com/reactphp/socket#connectorinterface)
- * to the [`Browser`](https://github.com/clue/reactphp-buzz#browser) instance:
+ * to the [`Browser`](https://github.com/clue/reactphp/http#browser) instance:
  *
  * ```php
  * $connector = new \React\Socket\Connector($loop, array(
@@ -136,7 +136,7 @@ use React\Promise\PromiseInterface;
  *
  * The `proxy_host` option (and family) is not supported by this library. As an
  * alternative, you can configure the given `$browser` instance to use an
- * [HTTP proxy server](https://github.com/clue/reactphp-buzz#http-proxy).
+ * [HTTP proxy server](https://github.com/clue/reactphp/http#http-proxy).
  * If you find any other option is missing or not supported here, PRs are much
  * appreciated!
  *
@@ -164,11 +164,8 @@ class Client
         // This is done in order to process these error responses through the normal SOAP decoder.
         // Additionally, we explicitly limit number of redirects to zero because following redirects makes little sense
         // because it transforms the POST request to a GET one and hence loses the SOAP request body.
-        $browser = $browser->withOptions(array(
-            'obeySuccessCode' => false,
-            'followRedirects' => true,
-            'maxRedirects' => 0
-        ));
+        $browser = $browser->withRejectErrorResponse(false);
+        $browser = $browser->withFollowRedirects(0);
 
         $this->browser = $browser;
         $this->encoder = new ClientEncoder($wsdl, $options);
@@ -206,7 +203,12 @@ class Client
 
         $decoder = $this->decoder;
 
-        return $this->browser->send($request)->then(
+        return $this->browser->request(
+            $request->getMethod(),
+            (string) $request->getUri(),
+            $request->getHeaders(),
+            (string) $request->getBody()
+        )->then(
             function (ResponseInterface $response) use ($decoder, $name) {
                 // HTTP response received => decode results for this function call
                 return $decoder->decode($name, (string)$response->getBody());
