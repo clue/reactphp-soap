@@ -25,7 +25,7 @@ use React\Promise\PromiseInterface;
  * $wsdl = '<?xml …';
  * $options = array();
  *
- * $client = new Client($browser, $wsdl, $options);
+ * $client = new Clue\React\Soap\Client($browser, $wsdl, $options);
  * ```
  *
  * If you need custom connector settings (DNS resolution, TLS parameters, timeouts,
@@ -34,7 +34,7 @@ use React\Promise\PromiseInterface;
  * to the [`Browser`](https://github.com/clue/reactphp/http#browser) instance:
  *
  * ```php
- * $connector = new \React\Socket\Connector($loop, array(
+ * $connector = new React\Socket\Connector($loop, array(
  *     'dns' => '127.0.0.1',
  *     'tcp' => array(
  *         'bindto' => '192.168.10.1:0'
@@ -45,8 +45,8 @@ use React\Promise\PromiseInterface;
  *     )
  * ));
  *
- * $browser = new Browser($loop, $connector);
- * $client = new Client($browser, $wsdl);
+ * $browser = new React\Http\Browser($loop, $connector);
+ * $client = new Clue\React\Soap\Client($browser, $wsdl);
  * ```
  *
  * The `Client` works similar to PHP's `SoapClient` (which it uses under the
@@ -55,12 +55,12 @@ use React\Promise\PromiseInterface;
  * downloading the WSDL file contents from an URL through the `Browser`:
  *
  * ```php
- * $browser = new Browser($loop);
+ * $browser = new React\Http\Browser($loop);
  *
  * $browser->get($url)->then(
- *     function (ResponseInterface $response) use ($browser) {
+ *     function (Psr\Http\Message\ResponseInterface $response) use ($browser) {
  *         // WSDL file is ready, create client
- *         $client = new Client($browser, (string)$response->getBody());
+ *         $client = new Clue\React\Soap\Client($browser, (string)$response->getBody());
  *
  *         // do something…
  *     },
@@ -76,7 +76,7 @@ use React\Promise\PromiseInterface;
  *
  * ```php
  * try {
- *     $client = new Client($browser, $wsdl);
+ *     $client = new Clue\React\Soap\Client($browser, $wsdl);
  * } catch (SoapFault $e) {
  *     echo 'Error: ' . $e->getMessage() . PHP_EOL;
  * }
@@ -99,7 +99,7 @@ use React\Promise\PromiseInterface;
  * namespace of the SOAP service:
  *
  * ```php
- * $client = new Client($browser, null, array(
+ * $client = new Clue\React\Soap\Client($browser, null, array(
  *     'location' => 'http://example.com',
  *     'uri' => 'http://ping.example.com',
  * ));
@@ -109,7 +109,7 @@ use React\Promise\PromiseInterface;
  * explicitly overwrite the URL of the SOAP server to send the request to:
  *
  * ```php
- * $client = new Client($browser, $wsdl, array(
+ * $client = new Clue\React\Soap\Client($browser, $wsdl, array(
  *     'location' => 'http://example.com'
  * ));
  * ```
@@ -118,7 +118,7 @@ use React\Promise\PromiseInterface;
  * use SOAP 1.2 instead:
  *
  * ```php
- * $client = new Client($browser, $wsdl, array(
+ * $client = new Clue\React\Soap\Client($browser, $wsdl, array(
  *     'soap_version' => SOAP_1_2
  * ));
  * ```
@@ -127,7 +127,7 @@ use React\Promise\PromiseInterface;
  * like this:
  *
  * ```php
- * $client = new Client($browser, $wsdl, array(
+ * $client = new Clue\React\Soap\Client($browser, $wsdl, array(
  *     'classmap' => array(
  *         'getBankResponseType' => BankResponse::class
  *     )
@@ -183,7 +183,7 @@ class Client
      * Note: This is considered *advanced usage*, you may want to look into using the [`Proxy`](#proxy) instead.
      *
      * ```php
-     * $proxy = new Proxy($client);
+     * $proxy = new Clue\React\Soap\Proxy($client);
      * $promise = $proxy->ping('hello', 42);
      * ```
      *
