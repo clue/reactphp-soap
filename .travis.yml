@@ -15,9 +15,6 @@ jobs:
     - php: 7.2
     - php: 7.3
     - php: 7.4
-    - php: hhvm-3.18
-  allow_failures:
-    - php: hhvm-3.18
 
 install:
   - composer install
