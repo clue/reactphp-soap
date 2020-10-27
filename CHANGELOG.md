@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.0.0 (2020-10-28)
+
+*   Feature / BC break: Update to reactphp/http v1.0.0.
+    (#45 by @SimonFrings)
+
+*   Feature / BC break: Add type declarations and require PHP 7.1+ as a consequence
+    (#47 by @SimonFrings, #49 by @clue)
+
+*   Use fully qualified class names in documentation.
+    (#46 by @SimonFrings)
+
+*   Improve test suite and add `.gitattributes` to exclude dev files from export.
+    Prepare PHP 8 support, update to PHPUnit 9 and simplify test matrix.
+    (#40 by @andreybolonin, #42 and #44 by @SimonFrings and #48 by @clue)
+
 ## 1.0.0 (2018-11-07)
 
 *   First stable release, now following SemVer!
