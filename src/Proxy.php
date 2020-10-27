@@ -9,7 +9,7 @@ use React\Promise\PromiseInterface;
  * SOAP functions.
  *
  * ```php
- * $proxy = new Proxy($client);
+ * $proxy = new Clue\React\Soap\Proxy($client);
  * ```
  *
  * Each and every method call to the `Proxy` class will be sent via SOAP.
