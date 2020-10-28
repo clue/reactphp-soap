@@ -36,27 +36,23 @@ class ClientEncoderTest extends TestCase
         $this->assertFalse($request->hasHeader('SOAPAction'));
     }
 
-    /**
-     * @expectedException SoapFault
-     */
     public function testConstructorThrowsWhenUrlIsInvalid()
     {
         if (extension_loaded('xdebug')) {
             $this->markTestSkipped('Invalid WSDL causes a fatal error when ext-xdebug is loaded');
         }
 
+        $this->setExpectedException('SoapFault');
         new ClientEncoder('invalid');
     }
 
-    /**
-     * @expectedException SoapFault
-     */
     public function testConstructorThrowsWhenNonWsdlDoesNotDefineLocationAndUri()
     {
         if (extension_loaded('xdebug')) {
             $this->markTestSkipped('Invalid non-WSDL mode causes a fatal error when ext-xdebug is loaded');
         }
 
+        $this->setExpectedException('SoapFault');
         new ClientEncoder(null);
     }
 
@@ -79,5 +75,22 @@ class ClientEncoderTest extends TestCase
 ';
 
         $this->assertEquals($expected, (string)$request->getBody());
+    }
+
+    public function setExpectedException($exception, $exceptionMessage = '', $exceptionCode = null)
+    {
+        if (method_exists($this, 'expectException')) {
+            // PHPUnit 5+
+            $this->expectException($exception);
+            if ($exceptionMessage !== '') {
+                $this->expectExceptionMessage($exceptionMessage);
+            }
+            if ($exceptionCode !== null) {
+                $this->expectExceptionCode($exceptionCode);
+            }
+        } else {
+            // legacy PHPUnit 4
+            parent::setExpectedException($exception, $exceptionMessage, $exceptionCode);
+        }
     }
 }

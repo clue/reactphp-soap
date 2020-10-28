@@ -8,10 +8,6 @@ use React\Promise\Promise;
 
 class ClientTest extends TestCase
 {
-
-    /**
-     * @expectedException SoapFault
-     */
     public function testConstructorThrowsWhenUrlIsInvalid()
     {
         if (extension_loaded('xdebug')) {
@@ -19,15 +15,18 @@ class ClientTest extends TestCase
         }
 
         $browser = $this->getMockBuilder('React\Http\Browser')->disableOriginalConstructor()->getMock();
+        $browser->expects($this->once())->method('withRejectErrorResponse')->willReturnSelf();
+        $browser->expects($this->once())->method('withFollowRedirects')->willReturnSelf();
+
         $wsdl = 'invalid';
 
-        $client = new Client($browser, $wsdl);
+        $this->setExpectedException('SoapFault');
+        new Client($browser, $wsdl);
     }
 
     public function testNonWsdlClientReturnsSameLocationOptionForAnyFunction()
     {
         $browser = $this->getMockBuilder('React\Http\Browser')->disableOriginalConstructor()->getMock();
-
         $browser->expects($this->once())->method('withRejectErrorResponse')->willReturnSelf();
         $browser->expects($this->once())->method('withFollowRedirects')->willReturnSelf();
 
@@ -39,7 +38,6 @@ class ClientTest extends TestCase
     public function testNonWsdlClientReturnsNoTypesAndFunctions()
     {
         $browser = $this->getMockBuilder('React\Http\Browser')->disableOriginalConstructor()->getMock();
-
         $browser->expects($this->once())->method('withRejectErrorResponse')->willReturnSelf();
         $browser->expects($this->once())->method('withFollowRedirects')->willReturnSelf();
 
@@ -60,5 +58,22 @@ class ClientTest extends TestCase
         $client = new Client($browser, null, array('location' => 'http://example.com', 'uri' => 'http://example.com/uri'));
 
         $client->soapCall('ping', array());
+    }
+
+    public function setExpectedException($exception, $exceptionMessage = '', $exceptionCode = null)
+    {
+        if (method_exists($this, 'expectException')) {
+            // PHPUnit 5+
+            $this->expectException($exception);
+            if ($exceptionMessage !== '') {
+                $this->expectExceptionMessage($exceptionMessage);
+            }
+            if ($exceptionCode !== null) {
+                $this->expectExceptionCode($exceptionCode);
+            }
+        } else {
+            // legacy PHPUnit 4
+            parent::setExpectedException($exception, $exceptionMessage, $exceptionCode);
+        }
     }
 }
