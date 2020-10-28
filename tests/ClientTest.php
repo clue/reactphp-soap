@@ -20,7 +20,7 @@ class ClientTest extends TestCase
 
         $wsdl = 'invalid';
 
-        $this->setExpectedException('SoapFault');
+        $this->expectException(\SoapFault::class);
         new Client($browser, $wsdl);
     }
 
@@ -58,22 +58,5 @@ class ClientTest extends TestCase
         $client = new Client($browser, null, array('location' => 'http://example.com', 'uri' => 'http://example.com/uri'));
 
         $client->soapCall('ping', array());
-    }
-
-    public function setExpectedException($exception, $exceptionMessage = '', $exceptionCode = null)
-    {
-        if (method_exists($this, 'expectException')) {
-            // PHPUnit 5+
-            $this->expectException($exception);
-            if ($exceptionMessage !== '') {
-                $this->expectExceptionMessage($exceptionMessage);
-            }
-            if ($exceptionCode !== null) {
-                $this->expectExceptionCode($exceptionCode);
-            }
-        } else {
-            // legacy PHPUnit 4
-            parent::setExpectedException($exception, $exceptionMessage, $exceptionCode);
-        }
     }
 }

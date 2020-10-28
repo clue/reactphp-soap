@@ -42,7 +42,7 @@ class ClientEncoderTest extends TestCase
             $this->markTestSkipped('Invalid WSDL causes a fatal error when ext-xdebug is loaded');
         }
 
-        $this->setExpectedException('SoapFault');
+        $this->expectException(\SoapFault::class);
         new ClientEncoder('invalid');
     }
 
@@ -52,7 +52,7 @@ class ClientEncoderTest extends TestCase
             $this->markTestSkipped('Invalid non-WSDL mode causes a fatal error when ext-xdebug is loaded');
         }
 
-        $this->setExpectedException('SoapFault');
+        $this->expectException(\SoapFault::class);
         new ClientEncoder(null);
     }
 
@@ -75,22 +75,5 @@ class ClientEncoderTest extends TestCase
 ';
 
         $this->assertEquals($expected, (string)$request->getBody());
-    }
-
-    public function setExpectedException($exception, $exceptionMessage = '', $exceptionCode = null)
-    {
-        if (method_exists($this, 'expectException')) {
-            // PHPUnit 5+
-            $this->expectException($exception);
-            if ($exceptionMessage !== '') {
-                $this->expectExceptionMessage($exceptionMessage);
-            }
-            if ($exceptionCode !== null) {
-                $this->expectExceptionCode($exceptionCode);
-            }
-        } else {
-            // legacy PHPUnit 4
-            parent::setExpectedException($exception, $exceptionMessage, $exceptionCode);
-        }
     }
 }
