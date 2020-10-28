@@ -8,26 +8,25 @@ use React\Promise\Promise;
 
 class ClientTest extends TestCase
 {
-
-    /**
-     * @expectedException SoapFault
-     */
     public function testConstructorThrowsWhenUrlIsInvalid()
     {
-        if (extension_loaded('xdebug')) {
-            $this->markTestSkipped('Invalid WSDL causes a fatal error when ext-xdebug is loaded');
+        if (extension_loaded('xdebug') && phpversion('xdebug') < 2.7) {
+            $this->markTestSkipped('Invalid WSDL causes a fatal error when ext-xdebug < 2.7 is loaded');
         }
 
         $browser = $this->getMockBuilder('React\Http\Browser')->disableOriginalConstructor()->getMock();
+        $browser->expects($this->once())->method('withRejectErrorResponse')->willReturnSelf();
+        $browser->expects($this->once())->method('withFollowRedirects')->willReturnSelf();
+
         $wsdl = 'invalid';
 
-        $client = new Client($browser, $wsdl);
+        $this->expectException(\SoapFault::class);
+        new Client($browser, $wsdl);
     }
 
     public function testNonWsdlClientReturnsSameLocationOptionForAnyFunction()
     {
         $browser = $this->getMockBuilder('React\Http\Browser')->disableOriginalConstructor()->getMock();
-
         $browser->expects($this->once())->method('withRejectErrorResponse')->willReturnSelf();
         $browser->expects($this->once())->method('withFollowRedirects')->willReturnSelf();
 
@@ -39,7 +38,6 @@ class ClientTest extends TestCase
     public function testNonWsdlClientReturnsNoTypesAndFunctions()
     {
         $browser = $this->getMockBuilder('React\Http\Browser')->disableOriginalConstructor()->getMock();
-
         $browser->expects($this->once())->method('withRejectErrorResponse')->willReturnSelf();
         $browser->expects($this->once())->method('withFollowRedirects')->willReturnSelf();
 

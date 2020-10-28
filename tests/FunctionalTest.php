@@ -134,8 +134,9 @@ class FunctionalTest extends TestCase
         $api = new Proxy($this->client);
         $promise = $api->getBank('a');
 
-        $this->setExpectedException('RuntimeException', 'redirects');
-        $result = Block\await($promise, $this->loop);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('redirects');
+        Block\await($promise, $this->loop);
     }
 
     public function testBlzServiceWithInvalidBlzRejectsWithSoapFault()
@@ -144,7 +145,8 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => 'invalid'));
 
-        $this->setExpectedException('SoapFault', 'Keine Bank zur BLZ invalid gefunden!');
+        $this->expectException(\SoapFault::class);
+        $this->expectExceptionMessage('Keine Bank zur BLZ invalid gefunden!');
         Block\await($promise, $this->loop);
     }
 
@@ -154,7 +156,8 @@ class FunctionalTest extends TestCase
 
         $promise = $api->doesNotExist();
 
-        $this->setExpectedException('SoapFault', 'Function ("doesNotExist") is not a valid method for this service');
+        $this->expectException(\SoapFault::class);
+        $this->expectExceptionMessage('Function ("doesNotExist") is not a valid method for this service');
         Block\await($promise, $this->loop);
     }
 
@@ -165,7 +168,8 @@ class FunctionalTest extends TestCase
         $promise = $api->getBank(array('blz' => '12070000'));
         $promise->cancel();
 
-        $this->setExpectedException('RuntimeException', 'cancelled');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('cancelled');
         Block\await($promise, $this->loop);
     }
 
@@ -179,7 +183,8 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
-        $this->setExpectedException('RuntimeException', 'timed out');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('timed out');
         Block\await($promise, $this->loop);
     }
 
@@ -196,13 +201,13 @@ class FunctionalTest extends TestCase
 
     public function testGetLocationOfUnknownFunctionNameFails()
     {
-        $this->setExpectedException('SoapFault');
+        $this->expectException(\SoapFault::class);
         $this->client->getLocation('unknown');
     }
 
     public function testGetLocationForUnknownFunctionNumberFails()
     {
-        $this->setExpectedException('SoapFault');
+        $this->expectException(\SoapFault::class);
         $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation(100));
     }
 
@@ -230,7 +235,7 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
-        $this->setExpectedException('RuntimeException');
+        $this->expectException(\RuntimeException::class);
         Block\await($promise, $this->loop);
     }
 
@@ -255,23 +260,6 @@ class FunctionalTest extends TestCase
         } else {
             // PHPUnit 7.5+
             $this->assertIsObject($actual);
-        }
-    }
-
-    public function setExpectedException($exception, $exceptionMessage = '', $exceptionCode = null)
-    {
-        if (method_exists($this, 'expectException')) {
-            // PHPUnit 5+
-            $this->expectException($exception);
-            if ($exceptionMessage !== '') {
-                $this->expectExceptionMessage($exceptionMessage);
-            }
-            if ($exceptionCode !== null) {
-                $this->expectExceptionCode($exceptionCode);
-            }
-        } else {
-            // legacy PHPUnit 4
-            parent::setExpectedException($exception, $exceptionMessage, $exceptionCode);
         }
     }
 }

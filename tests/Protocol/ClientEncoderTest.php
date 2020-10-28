@@ -36,27 +36,23 @@ class ClientEncoderTest extends TestCase
         $this->assertFalse($request->hasHeader('SOAPAction'));
     }
 
-    /**
-     * @expectedException SoapFault
-     */
     public function testConstructorThrowsWhenUrlIsInvalid()
     {
-        if (extension_loaded('xdebug')) {
-            $this->markTestSkipped('Invalid WSDL causes a fatal error when ext-xdebug is loaded');
+        if (extension_loaded('xdebug') && phpversion('xdebug') < 2.7) {
+            $this->markTestSkipped('Invalid WSDL causes a fatal error when ext-xdebug < 2.7 is loaded');
         }
 
+        $this->expectException(\SoapFault::class);
         new ClientEncoder('invalid');
     }
 
-    /**
-     * @expectedException SoapFault
-     */
     public function testConstructorThrowsWhenNonWsdlDoesNotDefineLocationAndUri()
     {
-        if (extension_loaded('xdebug')) {
-            $this->markTestSkipped('Invalid non-WSDL mode causes a fatal error when ext-xdebug is loaded');
+        if (extension_loaded('xdebug') && phpversion('xdebug') < 2.7) {
+            $this->markTestSkipped('Invalid non-WSDL mode causes a fatal error when ext-xdebug < 2.7 is loaded');
         }
 
+        $this->expectException(\SoapFault::class);
         new ClientEncoder(null);
     }
 

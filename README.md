@@ -147,9 +147,10 @@ try {
 }
 ```
 
-> Note that if you have `ext-xdebug` loaded, this may halt with a fatal
-  error instead of throwing a `SoapFault`. It is not recommended to use this
-  extension in production, so this should only ever affect test environments.
+> Note that if you have an old version of `ext-xdebug` < 2.7 loaded, this may
+  halt with a fatal error instead of throwing a `SoapFault`. It is not
+  recommended to use this extension in production, so this should only ever
+  affect test environments.
 
 The `Client` constructor accepts an array of options. All given options will
 be passed through to the underlying `SoapClient`. However, not all options
