@@ -10,8 +10,8 @@ class ClientTest extends TestCase
 {
     public function testConstructorThrowsWhenUrlIsInvalid()
     {
-        if (extension_loaded('xdebug')) {
-            $this->markTestSkipped('Invalid WSDL causes a fatal error when ext-xdebug is loaded');
+        if (extension_loaded('xdebug') && phpversion('xdebug') < 2.7) {
+            $this->markTestSkipped('Invalid WSDL causes a fatal error when ext-xdebug < 2.7 is loaded');
         }
 
         $browser = $this->getMockBuilder('React\Http\Browser')->disableOriginalConstructor()->getMock();
