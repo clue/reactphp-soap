@@ -157,7 +157,7 @@ class Client
      * @param string|null $wsdlContents
      * @param array       $options
      */
-    public function __construct(Browser $browser, $wsdlContents, array $options = array())
+    public function __construct(Browser $browser, ?string $wsdlContents, array $options = array())
     {
         $wsdl = $wsdlContents !== null ? 'data://text/plain;base64,' . base64_encode($wsdlContents) : null;
 
@@ -192,7 +192,7 @@ class Client
      * @param mixed[] $args
      * @return PromiseInterface Returns a Promise<mixed, Exception>
      */
-    public function soapCall($name, $args)
+    public function soapCall(string $name, array $args): PromiseInterface
     {
         try {
             $request = $this->encoder->encode($name, $args);
@@ -226,7 +226,7 @@ class Client
      *
      * @return string[]|null
      */
-    public function getFunctions()
+    public function getFunctions(): ?array
     {
         return $this->encoder->__getFunctions();
     }
@@ -240,7 +240,7 @@ class Client
      *
      * @return string[]|null
      */
-    public function getTypes()
+    public function getTypes(): ?array
     {
         return $this->encoder->__getTypes();
     }
@@ -281,7 +281,7 @@ class Client
      * @throws \SoapFault if given function does not exist
      * @see self::getFunctions()
      */
-    public function getLocation($function)
+    public function getLocation($function): string
     {
         if (is_int($function)) {
             $functions = $this->getFunctions();
@@ -315,7 +315,7 @@ class Client
      * @return self
      * @see self::getLocation()
      */
-    public function withLocation($location)
+    public function withLocation(string $location): self
     {
         $client = clone $this;
         $client->encoder = clone $this->encoder;

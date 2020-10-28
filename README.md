@@ -409,7 +409,7 @@ $ composer require clue/soap-react:^1.0
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
 
 This project aims to run on any platform and thus only requires `ext-soap` and
-supports running on PHP 7+.
+supports running on PHP 7.1+.
 
 ## Tests
 
