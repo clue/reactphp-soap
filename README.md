@@ -15,7 +15,7 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
 * **Async execution of functions** -
   Send any number of functions (RPCs) to the remote web service in parallel and
   process their responses as soon as results come in.
-  The Promise-based design provides a *sane* interface to working with out of bound responses.
+  The Promise-based design provides a *sane* interface to working with out of order responses.
 * **Async processing of the WSDL** -
   The WSDL (web service description language) file will be downloaded and processed
   in the background.
@@ -30,6 +30,7 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
 
 **Table of contents**
 
+* [Support us](#support-us)
 * [Quickstart example](#quickstart-example)
 * [Usage](#usage)
   * [Client](#client)
@@ -46,6 +47,16 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
 * [Install](#install)
 * [Tests](#tests)
 * [License](#license)
+
+## Support us
+
+We invest a lot of time developing, maintaining and updating our awesome
+open-source projects. You can help us sustain this high-quality of our work by
+[becoming a sponsor on GitHub](https://github.com/sponsors/clue). Sponsors get
+numerous benefits in return, see our [sponsoring page](https://github.com/sponsors/clue)
+for details.
+
+Let's take these projects to the next level together! 🚀
 
 ## Quickstart example
 
@@ -155,7 +166,7 @@ try {
 The `Client` constructor accepts an array of options. All given options will
 be passed through to the underlying `SoapClient`. However, not all options
 make sense in this async implementation and as such may not have the desired
-effect. See also [`SoapClient`](http://php.net/manual/en/soapclient.soapclient.php)
+effect. See also [`SoapClient`](https://www.php.net/manual/en/soapclient.soapclient.php)
 documentation for more details.
 
 If working in WSDL mode, the `$options` parameter is optional. If working in
@@ -232,7 +243,7 @@ The `getFunctions(): string[]|null` method can be used to
 return an array of functions defined in the WSDL.
 
 It returns the equivalent of PHP's 
-[`SoapClient::__getFunctions()`](http://php.net/manual/en/soapclient.getfunctions.php).
+[`SoapClient::__getFunctions()`](https://www.php.net/manual/en/soapclient.getfunctions.php).
 In non-WSDL mode, this method returns `null`.
 
 #### getTypes()
@@ -241,7 +252,7 @@ The `getTypes(): string[]|null` method can be used to
 return an array of types defined in the WSDL.
 
 It returns the equivalent of PHP's
-[`SoapClient::__getTypes()`](http://php.net/manual/en/soapclient.gettypes.php).
+[`SoapClient::__getTypes()`](https://www.php.net/manual/en/soapclient.gettypes.php).
 In non-WSDL mode, this method returns `null`.
 
 #### getLocation()
@@ -403,7 +414,7 @@ This project follows [SemVer](https://semver.org/).
 This will install the latest supported version:
 
 ```bash
-$ composer require clue/soap-react:^1.0
+$ composer require clue/soap-react:^2.0
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.

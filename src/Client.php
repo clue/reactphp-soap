@@ -90,7 +90,7 @@ use React\Promise\PromiseInterface;
  * The `Client` constructor accepts an array of options. All given options will
  * be passed through to the underlying `SoapClient`. However, not all options
  * make sense in this async implementation and as such may not have the desired
- * effect. See also [`SoapClient`](http://php.net/manual/en/soapclient.soapclient.php)
+ * effect. See also [`SoapClient`](https://www.php.net/manual/en/soapclient.soapclient.php)
  * documentation for more details.
  *
  * If working in WSDL mode, the `$options` parameter is optional. If working in
@@ -221,7 +221,7 @@ class Client
      * Returns an array of functions defined in the WSDL.
      *
      * It returns the equivalent of PHP's
-     * [`SoapClient::__getFunctions()`](http://php.net/manual/en/soapclient.getfunctions.php).
+     * [`SoapClient::__getFunctions()`](https://www.php.net/manual/en/soapclient.getfunctions.php).
      * In non-WSDL mode, this method returns `null`.
      *
      * @return string[]|null
@@ -235,7 +235,7 @@ class Client
      * Returns an array of types defined in the WSDL.
      *
      * It returns the equivalent of PHP's
-     * [`SoapClient::__getTypes()`](http://php.net/manual/en/soapclient.gettypes.php).
+     * [`SoapClient::__getTypes()`](https://www.php.net/manual/en/soapclient.gettypes.php).
      * In non-WSDL mode, this method returns `null`.
      *
      * @return string[]|null
