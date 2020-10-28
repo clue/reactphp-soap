@@ -57,7 +57,7 @@ class FunctionalTest extends TestCase
 
         $result = Block\await($promise, $this->loop);
 
-        $this->assertIsTypeObject($result);
+        $this->assertIsObject($result);
         $this->assertTrue(isset($result->details));
         $this->assertTrue(isset($result->details->bic));
     }
@@ -99,7 +99,7 @@ class FunctionalTest extends TestCase
 
         $result = Block\await($promise, $this->loop);
 
-        $this->assertIsTypeObject($result);
+        $this->assertIsObject($result);
         $this->assertTrue(isset($result->details));
         $this->assertTrue(isset($result->details->bic));
     }
@@ -119,7 +119,7 @@ class FunctionalTest extends TestCase
 
         $result = Block\await($promise, $this->loop);
 
-        $this->assertIsTypeObject($result);
+        $this->assertIsObject($result);
         $this->assertFalse(isset($result->details));
         $this->assertTrue(isset($result->bic));
     }
@@ -249,17 +249,6 @@ class FunctionalTest extends TestCase
         $promise = $api->getBank(array('blz' => '12070000'));
 
         $result = Block\await($promise, $this->loop);
-        $this->assertIsTypeObject($result);
-    }
-
-    public function assertIsTypeObject($actual)
-    {
-        if (method_exists($this, 'assertInternalType')) {
-            // legacy PHPUnit 4 - PHPUnit 7.5
-            $this->assertInternalType('object', $actual);
-        } else {
-            // PHPUnit 7.5+
-            $this->assertIsObject($actual);
-        }
+        $this->assertIsObject($result);
     }
 }

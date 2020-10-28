@@ -43,7 +43,7 @@ final class Proxy
      * @param mixed[] $args
      * @return PromiseInterface
      */
-    public function __call($name, $args)
+    public function __call(string $name, array $args): PromiseInterface
     {
         return $this->client->soapCall($name, $args);
     }

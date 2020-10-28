@@ -17,13 +17,13 @@
         "psr-4": { "Clue\\Tests\\React\\Soap\\": "tests/" }
     },
     "require": {
-        "php": ">=7.0",
+        "php": ">=7.1",
         "react/http": "^1.0",
         "react/promise": "^2.1 || ^1.2",
         "ext-soap": "*"
     },
     "require-dev": {
         "clue/block-react": "^1.0",
-        "phpunit/phpunit": "^9.3 || ^6.5"
+        "phpunit/phpunit": "^9.3 || ^7.5"
     }
 }

@@ -2,12 +2,10 @@
 
 namespace Clue\React\Soap\Protocol;
 
-use \SoapClient;
-
 /**
  * @internal
  */
-final class ClientDecoder extends SoapClient
+final class ClientDecoder extends \SoapClient
 {
     private $response = null;
 
@@ -19,7 +17,7 @@ final class ClientDecoder extends SoapClient
      * @return mixed
      * @throws \SoapFault if response indicates a fault (error condition) or is invalid
      */
-    public function decode($function, $response)
+    public function decode(string $function, string $response)
     {
         // Temporarily save response internally for further processing
         $this->response = $response;
@@ -42,7 +40,7 @@ final class ClientDecoder extends SoapClient
      * the return code in this method. This will implicitly be invoked by the
      * call to `pseudoCall()` in the above `decode()` method.
      *
-     * @see SoapClient::__doRequest()
+     * @see \SoapClient::__doRequest()
      */
     public function __doRequest($request, $location, $action, $version, $one_way = 0)
     {
