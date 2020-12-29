@@ -381,15 +381,13 @@ cancel the pending request and reject its value with an Exception.
 
 Note that this timeout value covers creating the underlying transport connection,
 sending the SOAP request, waiting for the remote service to process the request
-and receiving the full SOAP response. To pass a custom timeout value, you can
-assign the underlying [`timeout` option](https://github.com/clue/reactphp/http#timeouts)
+and receiving the full SOAP response. To use a custom timeout value, you can
+pass the timeout to the [underlying `Browser`](https://github.com/reactphp/http#timeouts)
 like this:
 
 ```php
 $browser = new React\Http\Browser($loop);
-$browser = $browser->withOptions(array(
-    'timeout' => 10.0
-));
+$browser = $browser->withTimeout(10.0);
 
 $client = new Clue\React\Soap\Client($browser, $wsdl);
 $proxy = new Clue\React\Soap\Proxy($client);
@@ -403,7 +401,7 @@ $proxy->demo()->then(function ($response) {
 Similarly, you can use a negative timeout value to not apply a timeout at all
 or use a `null` value to restore the default handling. Note that the underlying
 connection may still impose a different timeout value. See also the underlying
-[`timeout` option](https://github.com/clue/reactphp/http#timeouts) for more details.
+[timeouts documentation](https://github.com/reactphp/http#timeouts) for more details.
 
 ## Install
 
