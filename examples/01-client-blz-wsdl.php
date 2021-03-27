@@ -1,20 +1,15 @@
 <?php
 
-use Clue\React\Buzz\Browser;
-use Clue\React\Soap\Client;
-use Clue\React\Soap\Proxy;
-use Psr\Http\Message\ResponseInterface;
-
 require __DIR__ . '/../vendor/autoload.php';
 
 $loop = React\EventLoop\Factory::create();
-$browser = new Browser($loop);
+$browser = new React\Http\Browser($loop);
 
 $blz = isset($argv[1]) ? $argv[1] : '12070000';
 
-$browser->get('http://www.thomas-bayer.com/axis2/services/BLZService?wsdl')->done(function (ResponseInterface $response) use ($browser, $blz) {
-    $client = new Client($browser, (string)$response->getBody());
-    $api = new Proxy($client);
+$browser->get('http://www.thomas-bayer.com/axis2/services/BLZService?wsdl')->done(function (Psr\Http\Message\ResponseInterface $response) use ($browser, $blz) {
+    $client = new Clue\React\Soap\Client($browser, (string)$response->getBody());
+    $api = new Clue\React\Soap\Proxy($client);
 
     $api->getBank(array('blz' => $blz))->then(
         function ($result) {

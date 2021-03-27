@@ -15,7 +15,7 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
 * **Async execution of functions** -
   Send any number of functions (RPCs) to the remote web service in parallel and
   process their responses as soon as results come in.
-  The Promise-based design provides a *sane* interface to working with out of bound responses.
+  The Promise-based design provides a *sane* interface to working with out of order responses.
 * **Async processing of the WSDL** -
   The WSDL (web service description language) file will be downloaded and processed
   in the background.
@@ -30,6 +30,7 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
 
 **Table of contents**
 
+* [Support us](#support-us)
 * [Quickstart example](#quickstart-example)
 * [Usage](#usage)
   * [Client](#client)
@@ -47,6 +48,16 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
 * [Tests](#tests)
 * [License](#license)
 
+## Support us
+
+We invest a lot of time developing, maintaining and updating our awesome
+open-source projects. You can help us sustain this high-quality of our work by
+[becoming a sponsor on GitHub](https://github.com/sponsors/clue). Sponsors get
+numerous benefits in return, see our [sponsoring page](https://github.com/sponsors/clue)
+for details.
+
+Let's take these projects to the next level together! 🚀
+
 ## Quickstart example
 
 Once [installed](#install), you can use the following code to query an example
@@ -54,12 +65,12 @@ web service via SOAP:
 
 ```php
 $loop = React\EventLoop\Factory::create();
-$browser = new Browser($loop);
+$browser = new React\Http\Browser($loop);
 $wsdl = 'http://example.com/demo.wsdl';
 
-$browser->get($wsdl)->then(function (ResponseInterface $response) use ($browser) {
-    $client = new Client($browser, (string)$response->getBody());
-    $api = new Proxy($client);
+$browser->get($wsdl)->then(function (Psr\Http\Message\ResponseInterface $response) use ($browser) {
+    $client = new Clue\React\Soap\Client($browser, (string)$response->getBody());
+    $api = new Clue\React\Soap\Proxy($client);
 
     $api->getBank(array('blz' => '12070000'))->then(function ($result) {
         var_dump('Result', $result);
@@ -78,28 +89,28 @@ See also the [examples](examples).
 The `Client` class is responsible for communication with the remote SOAP
 WebService server.
 
-It requires a [`Browser`](https://github.com/clue/reactphp-buzz#browser) object
+It requires a [`Browser`](https://github.com/reactphp/http#browser) object
 bound to the main [`EventLoop`](https://github.com/reactphp/event-loop#usage)
 in order to handle async requests, the WSDL file contents and an optional
 array of SOAP options:
 
 ```php
 $loop = React\EventLoop\Factory::create();
-$browser = new Clue\React\Buzz\Browser($loop);
+$browser = new React\Http\Browser($loop);
 
 $wsdl = '<?xml …';
 $options = array();
 
-$client = new Client($browser, $wsdl, $options);
+$client = new Clue\React\Soap\Client($browser, $wsdl, $options);
 ```
 
 If you need custom connector settings (DNS resolution, TLS parameters, timeouts,
 proxy servers etc.), you can explicitly pass a custom instance of the
 [`ConnectorInterface`](https://github.com/reactphp/socket#connectorinterface)
-to the [`Browser`](https://github.com/clue/reactphp-buzz#browser) instance:
+to the [`Browser`](https://github.com/reactphp/http#browser) instance:
 
 ```php
-$connector = new \React\Socket\Connector($loop, array(
+$connector = new React\Socket\Connector($loop, array(
     'dns' => '127.0.0.1',
     'tcp' => array(
         'bindto' => '192.168.10.1:0'
@@ -110,8 +121,8 @@ $connector = new \React\Socket\Connector($loop, array(
     )
 ));
 
-$browser = new Browser($loop, $connector);
-$client = new Client($browser, $wsdl);
+$browser = new React\Http\Browser($loop, $connector);
+$client = new Clue\React\Soap\Client($browser, $wsdl);
 ```
 
 The `Client` works similar to PHP's `SoapClient` (which it uses under the
@@ -120,12 +131,12 @@ you to use local WSDL files, WSDL files from a cache or the most common form,
 downloading the WSDL file contents from an URL through the `Browser`:
 
 ```php
-$browser = new Browser($loop);
+$browser = new React\Http\Browser($loop);
 
 $browser->get($url)->then(
-    function (ResponseInterface $response) use ($browser) {
+    function (Psr\Http\Message\ResponseInterface $response) use ($browser) {
         // WSDL file is ready, create client
-        $client = new Client($browser, (string)$response->getBody());
+        $client = new Clue\React\Soap\Client($browser, (string)$response->getBody());
 
         // do something…
     },
@@ -141,20 +152,21 @@ parsed, this will throw a `SoapFault`:
 
 ```php
 try {
-    $client = new Client($browser, $wsdl);
+    $client = new Clue\React\Soap\Client($browser, $wsdl);
 } catch (SoapFault $e) {
     echo 'Error: ' . $e->getMessage() . PHP_EOL;
 }
 ```
 
-> Note that if you have `ext-xdebug` loaded, this may halt with a fatal
-  error instead of throwing a `SoapFault`. It is not recommended to use this
-  extension in production, so this should only ever affect test environments.
+> Note that if you have an old version of `ext-xdebug` < 2.7 loaded, this may
+  halt with a fatal error instead of throwing a `SoapFault`. It is not
+  recommended to use this extension in production, so this should only ever
+  affect test environments.
 
 The `Client` constructor accepts an array of options. All given options will
 be passed through to the underlying `SoapClient`. However, not all options
 make sense in this async implementation and as such may not have the desired
-effect. See also [`SoapClient`](http://php.net/manual/en/soapclient.soapclient.php)
+effect. See also [`SoapClient`](https://www.php.net/manual/en/soapclient.soapclient.php)
 documentation for more details.
 
 If working in WSDL mode, the `$options` parameter is optional. If working in
@@ -164,7 +176,7 @@ the URL of the SOAP server to send the request to, and `uri` is the target
 namespace of the SOAP service:
 
 ```php
-$client = new Client($browser, null, array(
+$client = new Clue\React\Soap\Client($browser, null, array(
     'location' => 'http://example.com',
     'uri' => 'http://ping.example.com',
 ));
@@ -174,7 +186,7 @@ Similarly, if working in WSDL mode, the `location` option can be used to
 explicitly overwrite the URL of the SOAP server to send the request to:
 
 ```php
-$client = new Client($browser, $wsdl, array(
+$client = new Clue\React\Soap\Client($browser, $wsdl, array(
     'location' => 'http://example.com'
 ));
 ```
@@ -183,7 +195,7 @@ You can use the `soap_version` option to change from the default SOAP 1.1 to
 use SOAP 1.2 instead:
 
 ```php
-$client = new Client($browser, $wsdl, array(
+$client = new Clue\React\Soap\Client($browser, $wsdl, array(
     'soap_version' => SOAP_1_2
 ));
 ```
@@ -192,7 +204,7 @@ You can use the `classmap` option to map certain WSDL types to PHP classes
 like this:
 
 ```php
-$client = new Client($browser, $wsdl, array(
+$client = new Clue\React\Soap\Client($browser, $wsdl, array(
     'classmap' => array(
         'getBankResponseType' => BankResponse::class
     )
@@ -201,7 +213,7 @@ $client = new Client($browser, $wsdl, array(
 
 The `proxy_host` option (and family) is not supported by this library. As an
 alternative, you can configure the given `$browser` instance to use an
-[HTTP proxy server](https://github.com/clue/reactphp-buzz#http-proxy).
+[HTTP proxy server](https://github.com/reactphp/http#http-proxy).
 If you find any other option is missing or not supported here, PRs are much
 appreciated!
 
@@ -221,7 +233,7 @@ $promise = $client->soapCall('ping', array('hello', 42));
 Note: This is considered *advanced usage*, you may want to look into using the [`Proxy`](#proxy) instead.
 
 ```php
-$proxy = new Proxy($client);
+$proxy = new Clue\React\Soap\Proxy($client);
 $promise = $proxy->ping('hello', 42);
 ```
 
@@ -231,7 +243,7 @@ The `getFunctions(): string[]|null` method can be used to
 return an array of functions defined in the WSDL.
 
 It returns the equivalent of PHP's 
-[`SoapClient::__getFunctions()`](http://php.net/manual/en/soapclient.getfunctions.php).
+[`SoapClient::__getFunctions()`](https://www.php.net/manual/en/soapclient.getfunctions.php).
 In non-WSDL mode, this method returns `null`.
 
 #### getTypes()
@@ -240,7 +252,7 @@ The `getTypes(): string[]|null` method can be used to
 return an array of types defined in the WSDL.
 
 It returns the equivalent of PHP's
-[`SoapClient::__getTypes()`](http://php.net/manual/en/soapclient.gettypes.php).
+[`SoapClient::__getTypes()`](https://www.php.net/manual/en/soapclient.gettypes.php).
 In non-WSDL mode, this method returns `null`.
 
 #### getLocation()
@@ -301,7 +313,7 @@ The `Proxy` class wraps an existing [`Client`](#client) instance in order to eas
 SOAP functions.
 
 ```php
-$proxy = new Proxy($client);
+$proxy = new Clue\React\Soap\Proxy($client);
 ```
 
 > Note that this class is called "Proxy" because it will forward (proxy) all
@@ -369,18 +381,16 @@ cancel the pending request and reject its value with an Exception.
 
 Note that this timeout value covers creating the underlying transport connection,
 sending the SOAP request, waiting for the remote service to process the request
-and receiving the full SOAP response. To pass a custom timeout value, you can
-assign the underlying [`timeout` option](https://github.com/clue/reactphp-buzz#timeouts)
+and receiving the full SOAP response. To use a custom timeout value, you can
+pass the timeout to the [underlying `Browser`](https://github.com/reactphp/http#timeouts)
 like this:
 
 ```php
-$browser = new Browser($loop);
-$browser = $browser->withOptions(array(
-    'timeout' => 10.0
-));
+$browser = new React\Http\Browser($loop);
+$browser = $browser->withTimeout(10.0);
 
-$client = new Client($browser, $wsdl);
-$proxy = new Proxy($client);
+$client = new Clue\React\Soap\Client($browser, $wsdl);
+$proxy = new Clue\React\Soap\Proxy($client);
 
 $proxy->demo()->then(function ($response) {
     // response received within 10 seconds maximum
@@ -391,7 +401,7 @@ $proxy->demo()->then(function ($response) {
 Similarly, you can use a negative timeout value to not apply a timeout at all
 or use a `null` value to restore the default handling. Note that the underlying
 connection may still impose a different timeout value. See also the underlying
-[`timeout` option](https://github.com/clue/reactphp-buzz#timeouts) for more details.
+[timeouts documentation](https://github.com/reactphp/http#timeouts) for more details.
 
 ## Install
 
@@ -402,14 +412,13 @@ This project follows [SemVer](https://semver.org/).
 This will install the latest supported version:
 
 ```bash
-$ composer require clue/soap-react:^1.0
+$ composer require clue/soap-react:^2.0
 ```
 
 See also the [CHANGELOG](CHANGELOG.md) for details about version upgrades.
 
 This project aims to run on any platform and thus only requires `ext-soap` and
-supports running on legacy PHP 5.3 through current PHP 7+ and HHVM.
-It's *highly recommended to use PHP 7+* for this project.
+supports running on PHP 7.1+.
 
 ## Tests
 

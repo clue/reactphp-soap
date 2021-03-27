@@ -5,12 +5,11 @@ use PHPUnit\Framework\TestCase;
 
 class ClientDecoderTest extends TestCase
 {
-    /**
-     * @expectedException SoapFault
-     */
     public function testDecodeThrowsSoapFaultForInvalidResponse()
     {
         $decoder = new ClientDecoder(null, array('location' => '1', 'uri' => '2'));
+
+        $this->expectException(\SoapFault::class);
         $decoder->decode('anything', 'invalid');
     }
 

@@ -2,10 +2,10 @@
 
 namespace Clue\React\Soap;
 
-use Clue\React\Buzz\Browser;
 use Clue\React\Soap\Protocol\ClientDecoder;
 use Clue\React\Soap\Protocol\ClientEncoder;
 use Psr\Http\Message\ResponseInterface;
+use React\Http\Browser;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 
@@ -13,28 +13,28 @@ use React\Promise\PromiseInterface;
  * The `Client` class is responsible for communication with the remote SOAP
  * WebService server.
  *
- * It requires a [`Browser`](https://github.com/clue/reactphp-buzz#browser) object
+ * It requires a [`Browser`](https://github.com/reactphp/http#browser) object
  * bound to the main [`EventLoop`](https://github.com/reactphp/event-loop#usage)
  * in order to handle async requests, the WSDL file contents and an optional
  * array of SOAP options:
  *
  * ```php
  * $loop = React\EventLoop\Factory::create();
- * $browser = new Clue\React\Buzz\Browser($loop);
+ * $browser = new React\Http\Browser($loop);
  *
  * $wsdl = '<?xml …';
  * $options = array();
  *
- * $client = new Client($browser, $wsdl, $options);
+ * $client = new Clue\React\Soap\Client($browser, $wsdl, $options);
  * ```
  *
  * If you need custom connector settings (DNS resolution, TLS parameters, timeouts,
  * proxy servers etc.), you can explicitly pass a custom instance of the
  * [`ConnectorInterface`](https://github.com/reactphp/socket#connectorinterface)
- * to the [`Browser`](https://github.com/clue/reactphp-buzz#browser) instance:
+ * to the [`Browser`](https://github.com/clue/reactphp/http#browser) instance:
  *
  * ```php
- * $connector = new \React\Socket\Connector($loop, array(
+ * $connector = new React\Socket\Connector($loop, array(
  *     'dns' => '127.0.0.1',
  *     'tcp' => array(
  *         'bindto' => '192.168.10.1:0'
@@ -45,8 +45,8 @@ use React\Promise\PromiseInterface;
  *     )
  * ));
  *
- * $browser = new Browser($loop, $connector);
- * $client = new Client($browser, $wsdl);
+ * $browser = new React\Http\Browser($loop, $connector);
+ * $client = new Clue\React\Soap\Client($browser, $wsdl);
  * ```
  *
  * The `Client` works similar to PHP's `SoapClient` (which it uses under the
@@ -55,12 +55,12 @@ use React\Promise\PromiseInterface;
  * downloading the WSDL file contents from an URL through the `Browser`:
  *
  * ```php
- * $browser = new Browser($loop);
+ * $browser = new React\Http\Browser($loop);
  *
  * $browser->get($url)->then(
- *     function (ResponseInterface $response) use ($browser) {
+ *     function (Psr\Http\Message\ResponseInterface $response) use ($browser) {
  *         // WSDL file is ready, create client
- *         $client = new Client($browser, (string)$response->getBody());
+ *         $client = new Clue\React\Soap\Client($browser, (string)$response->getBody());
  *
  *         // do something…
  *     },
@@ -76,20 +76,21 @@ use React\Promise\PromiseInterface;
  *
  * ```php
  * try {
- *     $client = new Client($browser, $wsdl);
+ *     $client = new Clue\React\Soap\Client($browser, $wsdl);
  * } catch (SoapFault $e) {
  *     echo 'Error: ' . $e->getMessage() . PHP_EOL;
  * }
  * ```
  *
- * > Note that if you have `ext-xdebug` loaded, this may halt with a fatal
- *   error instead of throwing a `SoapFault`. It is not recommended to use this
- *   extension in production, so this should only ever affect test environments.
+ * > Note that if you have an old version of `ext-xdebug` < 2.7 loaded, this may
+ *   halt with a fatal error instead of throwing a `SoapFault`. It is not
+ *   recommended to use this extension in production, so this should only ever
+ *   affect test environments.
  *
  * The `Client` constructor accepts an array of options. All given options will
  * be passed through to the underlying `SoapClient`. However, not all options
  * make sense in this async implementation and as such may not have the desired
- * effect. See also [`SoapClient`](http://php.net/manual/en/soapclient.soapclient.php)
+ * effect. See also [`SoapClient`](https://www.php.net/manual/en/soapclient.soapclient.php)
  * documentation for more details.
  *
  * If working in WSDL mode, the `$options` parameter is optional. If working in
@@ -99,7 +100,7 @@ use React\Promise\PromiseInterface;
  * namespace of the SOAP service:
  *
  * ```php
- * $client = new Client($browser, null, array(
+ * $client = new Clue\React\Soap\Client($browser, null, array(
  *     'location' => 'http://example.com',
  *     'uri' => 'http://ping.example.com',
  * ));
@@ -109,7 +110,7 @@ use React\Promise\PromiseInterface;
  * explicitly overwrite the URL of the SOAP server to send the request to:
  *
  * ```php
- * $client = new Client($browser, $wsdl, array(
+ * $client = new Clue\React\Soap\Client($browser, $wsdl, array(
  *     'location' => 'http://example.com'
  * ));
  * ```
@@ -118,7 +119,7 @@ use React\Promise\PromiseInterface;
  * use SOAP 1.2 instead:
  *
  * ```php
- * $client = new Client($browser, $wsdl, array(
+ * $client = new Clue\React\Soap\Client($browser, $wsdl, array(
  *     'soap_version' => SOAP_1_2
  * ));
  * ```
@@ -127,7 +128,7 @@ use React\Promise\PromiseInterface;
  * like this:
  *
  * ```php
- * $client = new Client($browser, $wsdl, array(
+ * $client = new Clue\React\Soap\Client($browser, $wsdl, array(
  *     'classmap' => array(
  *         'getBankResponseType' => BankResponse::class
  *     )
@@ -136,7 +137,7 @@ use React\Promise\PromiseInterface;
  *
  * The `proxy_host` option (and family) is not supported by this library. As an
  * alternative, you can configure the given `$browser` instance to use an
- * [HTTP proxy server](https://github.com/clue/reactphp-buzz#http-proxy).
+ * [HTTP proxy server](https://github.com/clue/reactphp/http#http-proxy).
  * If you find any other option is missing or not supported here, PRs are much
  * appreciated!
  *
@@ -156,7 +157,7 @@ class Client
      * @param string|null $wsdlContents
      * @param array       $options
      */
-    public function __construct(Browser $browser, $wsdlContents, array $options = array())
+    public function __construct(Browser $browser, ?string $wsdlContents, array $options = array())
     {
         $wsdl = $wsdlContents !== null ? 'data://text/plain;base64,' . base64_encode($wsdlContents) : null;
 
@@ -164,11 +165,8 @@ class Client
         // This is done in order to process these error responses through the normal SOAP decoder.
         // Additionally, we explicitly limit number of redirects to zero because following redirects makes little sense
         // because it transforms the POST request to a GET one and hence loses the SOAP request body.
-        $browser = $browser->withOptions(array(
-            'obeySuccessCode' => false,
-            'followRedirects' => true,
-            'maxRedirects' => 0
-        ));
+        $browser = $browser->withRejectErrorResponse(false);
+        $browser = $browser->withFollowRedirects(0);
 
         $this->browser = $browser;
         $this->encoder = new ClientEncoder($wsdl, $options);
@@ -186,7 +184,7 @@ class Client
      * Note: This is considered *advanced usage*, you may want to look into using the [`Proxy`](#proxy) instead.
      *
      * ```php
-     * $proxy = new Proxy($client);
+     * $proxy = new Clue\React\Soap\Proxy($client);
      * $promise = $proxy->ping('hello', 42);
      * ```
      *
@@ -194,7 +192,7 @@ class Client
      * @param mixed[] $args
      * @return PromiseInterface Returns a Promise<mixed, Exception>
      */
-    public function soapCall($name, $args)
+    public function soapCall(string $name, array $args): PromiseInterface
     {
         try {
             $request = $this->encoder->encode($name, $args);
@@ -211,10 +209,15 @@ class Client
 
         $decoder = $this->decoder;
 
-        return $this->browser->send($request)->then(
+        return $this->browser->request(
+            $request->getMethod(),
+            (string) $request->getUri(),
+            $request->getHeaders(),
+            (string) $request->getBody()
+        )->then(
             function (ResponseInterface $response) use ($decoder, $name, $callObject) {
                 // HTTP response received => decode results for this function call
-                $callObject->setResponse((string)$response->getBody());
+                //return $decoder->decode($name, (string)$response->getBody());
                 try {
                     return $callObject->setContent(
                         $decoder->decode($name, (string)$response->getBody(), $callObject)
@@ -237,12 +240,12 @@ class Client
      * Returns an array of functions defined in the WSDL.
      *
      * It returns the equivalent of PHP's
-     * [`SoapClient::__getFunctions()`](http://php.net/manual/en/soapclient.getfunctions.php).
+     * [`SoapClient::__getFunctions()`](https://www.php.net/manual/en/soapclient.getfunctions.php).
      * In non-WSDL mode, this method returns `null`.
      *
      * @return string[]|null
      */
-    public function getFunctions()
+    public function getFunctions(): ?array
     {
         return $this->encoder->__getFunctions();
     }
@@ -251,12 +254,12 @@ class Client
      * Returns an array of types defined in the WSDL.
      *
      * It returns the equivalent of PHP's
-     * [`SoapClient::__getTypes()`](http://php.net/manual/en/soapclient.gettypes.php).
+     * [`SoapClient::__getTypes()`](https://www.php.net/manual/en/soapclient.gettypes.php).
      * In non-WSDL mode, this method returns `null`.
      *
      * @return string[]|null
      */
-    public function getTypes()
+    public function getTypes(): ?array
     {
         return $this->encoder->__getTypes();
     }
@@ -297,7 +300,7 @@ class Client
      * @throws \SoapFault if given function does not exist
      * @see self::getFunctions()
      */
-    public function getLocation($function)
+    public function getLocation($function): string
     {
         if (is_int($function)) {
             $functions = $this->getFunctions();
@@ -331,7 +334,7 @@ class Client
      * @return self
      * @see self::getLocation()
      */
-    public function withLocation($location)
+    public function withLocation(string $location): self
     {
         $client = clone $this;
         $client->encoder = clone $this->encoder;

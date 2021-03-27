@@ -2,13 +2,13 @@
 
 namespace Clue\React\Soap\Protocol;
 
-use \SoapClient;
+use Psr\Http\Message\RequestInterface;
 use RingCentral\Psr7\Request;
 
 /**
  * @internal
  */
-final class ClientEncoder extends SoapClient
+final class ClientEncoder extends \SoapClient
 {
     private $request = null;
 
@@ -16,11 +16,11 @@ final class ClientEncoder extends SoapClient
      * Encodes the given RPC function name and arguments as a SOAP request
      *
      * @param string $name
-     * @param array $args
-     * @return Request
+     * @param array  $args
+     * @return RequestInterface
      * @throws \SoapFault if request is invalid according to WSDL
      */
-    public function encode($name, $args)
+    public function encode(string $name, array $args): RequestInterface
     {
         $this->__soapCall($name, $args);
 
@@ -40,7 +40,7 @@ final class ClientEncoder extends SoapClient
      * This will implicitly be invoked by the call to `__soapCall()` in the
      * above `encode()` method.
      *
-     * @see SoapClient::__doRequest()
+     * @see \SoapClient::__doRequest()
      */
     public function __doRequest($request, $location, $action, $version, $one_way = 0)
     {
