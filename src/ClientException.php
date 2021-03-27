@@ -6,19 +6,22 @@ use Throwable;
 
 class ClientException extends \SoapFault
 {
+    /** @var mixed */
     protected $request;
+
+    /** @var mixed */
     protected $response;
+
+    /** @var string|null */
     protected $method;
 
     /**
-     * ClientException constructor.
-     *
      * @param string $message
      * @param int $code
      * @param Throwable|null $previous
      * @param string|null $method
-     * @param string|null $request
-     * @param string|null $response
+     * @param object|string|null $request
+     * @param object|string|null $response
      */
     public function __construct($message = "", $code = 0, Throwable $previous = null, $method = null, $request = null, $response = null)
     {
@@ -49,10 +52,8 @@ class ClientException extends \SoapFault
 
     /**
      * @param mixed $request
-     *
-     * @return ClientException
      */
-    public function setRequest($request)
+    public function setRequest($request): ClientException
     {
         $this->request = $request;
 
@@ -69,30 +70,20 @@ class ClientException extends \SoapFault
 
     /**
      * @param mixed $response
-     *
-     * @return ClientException
      */
-    public function setResponse($response)
+    public function setResponse($response): ClientException
     {
         $this->response = $response;
 
         return $this;
     }
 
-    /**
-     * @return null
-     */
-    public function getMethod()
+    public function getMethod(): ?string
     {
         return $this->method;
     }
 
-    /**
-     * @param null $method
-     *
-     * @return ClientException
-     */
-    public function setMethod($method)
+    public function setMethod(?string $method): ClientException
     {
         $this->method = $method;
 

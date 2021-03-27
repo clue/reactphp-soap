@@ -10,7 +10,7 @@ class SoapResponse
     /** @var string|null */
     private $request;
 
-    /** @var string|null */
+    /** @var string|object|null */
     private $content;
 
     /** @var string|null */
@@ -19,40 +19,24 @@ class SoapResponse
     /** @var mixed[] */
     private $params;
 
-    /**
-     * @return string|null
-     */
-    public function getResponse()
+    public function getResponse(): ?string
     {
         return $this->response;
     }
 
-    /**
-     * @param string|null $response
-     *
-     * @return SoapResponse
-     */
-    public function setResponse($response)
+    public function setResponse(?string $response): SoapResponse
     {
         $this->response = $response;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getRequest()
+    public function getRequest(): ?string
     {
         return $this->request;
     }
 
-    /**
-     * @param string|null $request
-     *
-     * @return SoapResponse
-     */
-    public function setRequest($request)
+    public function setRequest(?string $request): SoapResponse
     {
         $this->request = $request;
 
@@ -60,7 +44,7 @@ class SoapResponse
     }
 
     /**
-     * @return string|null
+     * @return string|null|object
      */
     public function getContent()
     {
@@ -68,31 +52,21 @@ class SoapResponse
     }
 
     /**
-     * @param string|null $content
-     *
-     * @return SoapResponse
+     * @param string|object|null $content
      */
-    public function setContent($content)
+    public function setContent($content): SoapResponse
     {
         $this->content = $content;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getMethod()
+    public function getMethod(): ?string
     {
         return $this->method;
     }
 
-    /**
-     * @param string|null $method
-     *
-     * @return SoapResponse
-     */
-    public function setMethod($method)
+    public function setMethod(?string $method): SoapResponse
     {
         $this->method = $method;
 
@@ -109,10 +83,8 @@ class SoapResponse
 
     /**
      * @param mixed[] $params
-     *
-     * @return SoapResponse
      */
-    public function setParams($params)
+    public function setParams($params): SoapResponse
     {
         $this->params = $params;
 
