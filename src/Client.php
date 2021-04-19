@@ -219,6 +219,8 @@ class Client
                 // HTTP response received => decode results for this function call
                 //return $decoder->decode($name, (string)$response->getBody());
                 try {
+                    $callObject->setResponse((string)$response->getBody());
+                    
                     return $callObject->setContent(
                         $decoder->decode($name, (string)$response->getBody(), $callObject)
                     );
