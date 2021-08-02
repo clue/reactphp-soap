@@ -1,6 +1,6 @@
 # clue/reactphp-soap 
 
-[![Build Status](https://travis-ci.org/clue/reactphp-soap.svg?branch=master)](https://travis-ci.org/clue/reactphp-soap)
+[![CI status](https://github.com/clue/reactphp-soap/workflows/CI/badge.svg)](https://github.com/clue/reactphp-soap/actions)
 [![installs on Packagist](https://img.shields.io/packagist/dt/clue/soap-react?color=blue&label=installs%20on%20Packagist)](https://packagist.org/packages/clue/soap-react)
 
 Simple, async [SOAP](https://en.wikipedia.org/wiki/SOAP) web service client library,
