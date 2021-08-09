@@ -19,8 +19,7 @@ use React\Promise\PromiseInterface;
  * array of SOAP options:
  *
  * ```php
- * $loop = React\EventLoop\Factory::create();
- * $browser = new React\Http\Browser($loop);
+ * $browser = new React\Http\Browser();
  *
  * $wsdl = '<?xml …';
  * $options = array();
@@ -34,7 +33,7 @@ use React\Promise\PromiseInterface;
  * to the [`Browser`](https://github.com/clue/reactphp/http#browser) instance:
  *
  * ```php
- * $connector = new React\Socket\Connector($loop, array(
+ * $connector = new React\Socket\Connector(null, array(
  *     'dns' => '127.0.0.1',
  *     'tcp' => array(
  *         'bindto' => '192.168.10.1:0'
@@ -45,7 +44,7 @@ use React\Promise\PromiseInterface;
  *     )
  * ));
  *
- * $browser = new React\Http\Browser($loop, $connector);
+ * $browser = new React\Http\Browser(null, $connector);
  * $client = new Clue\React\Soap\Client($browser, $wsdl);
  * ```
  *
@@ -55,7 +54,7 @@ use React\Promise\PromiseInterface;
  * downloading the WSDL file contents from an URL through the `Browser`:
  *
  * ```php
- * $browser = new React\Http\Browser($loop);
+ * $browser = new React\Http\Browser();
  *
  * $browser->get($url)->then(
  *     function (Psr\Http\Message\ResponseInterface $response) use ($browser) {

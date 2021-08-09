@@ -67,8 +67,11 @@ Once [installed](#install), you can use the following code to query an example
 web service via SOAP:
 
 ```php
-$loop = React\EventLoop\Factory::create();
-$browser = new React\Http\Browser($loop);
+<?php
+
+require __DIR__ . '/vendor/autoload.php';
+
+$browser = new React\Http\Browser();
 $wsdl = 'http://example.com/demo.wsdl';
 
 $browser->get($wsdl)->then(function (Psr\Http\Message\ResponseInterface $response) use ($browser) {
@@ -79,8 +82,6 @@ $browser->get($wsdl)->then(function (Psr\Http\Message\ResponseInterface $respons
         var_dump('Result', $result);
     });
 });
-
-$loop->run();
 ```
 
 See also the [examples](examples).
@@ -90,7 +91,8 @@ See also the [examples](examples).
 ### Client
 
 The `Client` class is responsible for communication with the remote SOAP
-WebService server.
+WebService server. It requires the WSDL file contents and an optional
+array of SOAP options:
 
 It requires a [`Browser`](https://github.com/reactphp/http#browser) object
 bound to the main [`EventLoop`](https://github.com/reactphp/event-loop#usage)
@@ -98,8 +100,7 @@ in order to handle async requests, the WSDL file contents and an optional
 array of SOAP options:
 
 ```php
-$loop = React\EventLoop\Factory::create();
-$browser = new React\Http\Browser($loop);
+$browser = new React\Http\Browser();
 
 $wsdl = '<?xml …';
 $options = array();
@@ -113,7 +114,7 @@ proxy servers etc.), you can explicitly pass a custom instance of the
 to the [`Browser`](https://github.com/reactphp/http#browser) instance:
 
 ```php
-$connector = new React\Socket\Connector($loop, array(
+$connector = new React\Socket\Connector(null, array(
     'dns' => '127.0.0.1',
     'tcp' => array(
         'bindto' => '192.168.10.1:0'
@@ -124,7 +125,7 @@ $connector = new React\Socket\Connector($loop, array(
     )
 ));
 
-$browser = new React\Http\Browser($loop, $connector);
+$browser = new React\Http\Browser(null, $connector);
 $client = new Clue\React\Soap\Client($browser, $wsdl);
 ```
 
@@ -134,7 +135,7 @@ you to use local WSDL files, WSDL files from a cache or the most common form,
 downloading the WSDL file contents from an URL through the `Browser`:
 
 ```php
-$browser = new React\Http\Browser($loop);
+$browser = new React\Http\Browser();
 
 $browser->get($url)->then(
     function (Psr\Http\Message\ResponseInterface $response) use ($browser) {
@@ -366,7 +367,7 @@ clean up any underlying resources.
 ```php
 $promise = $proxy->demo();
 
-$loop->addTimer(2.0, function () use ($promise) {
+Loop::addTimer(2.0, function () use ($promise) {
     $promise->cancel();
 });
 ```
@@ -389,7 +390,7 @@ pass the timeout to the [underlying `Browser`](https://github.com/reactphp/http#
 like this:
 
 ```php
-$browser = new React\Http\Browser($loop);
+$browser = new React\Http\Browser();
 $browser = $browser->withTimeout(10.0);
 
 $client = new Clue\React\Soap\Client($browser, $wsdl);

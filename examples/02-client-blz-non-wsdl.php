@@ -2,8 +2,7 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$loop = React\EventLoop\Factory::create();
-$browser = new React\Http\Browser($loop);
+$browser = new React\Http\Browser();
 
 $blz = isset($argv[1]) ? $argv[1] : '12070000';
 
@@ -23,5 +22,3 @@ $api->getBank(new SoapVar($blz, XSD_STRING, null, null, 'blz', 'http://thomas-ba
         echo 'ERROR: ' . $e->getMessage() . PHP_EOL;
     }
 );
-
-$loop->run();

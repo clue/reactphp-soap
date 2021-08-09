@@ -42,7 +42,7 @@ class FunctionalTest extends TestCase
      */
     public function setUpClient()
     {
-        $this->loop = \React\EventLoop\Factory::create();
+        $this->loop = \React\EventLoop\Loop::get();
         $this->client = new Client(new Browser($this->loop), self::$wsdl);
     }
 
