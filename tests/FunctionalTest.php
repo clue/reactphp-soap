@@ -6,6 +6,7 @@ use Clue\React\Block;
 use Clue\React\Soap\Client;
 use Clue\React\Soap\Proxy;
 use PHPUnit\Framework\TestCase;
+use React\EventLoop\Loop;
 use React\Http\Browser;
 
 class BankResponse
@@ -42,8 +43,7 @@ class FunctionalTest extends TestCase
      */
     public function setUpClient()
     {
-        $this->loop = \React\EventLoop\Loop::get();
-        $this->client = new Client(new Browser($this->loop), self::$wsdl);
+        $this->client = new Client(null, self::$wsdl);
     }
 
     public function testBlzService()
@@ -55,7 +55,7 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
-        $result = Block\await($promise, $this->loop);
+        $result = Block\await($promise, Loop::get());
 
         $this->assertIsObject($result);
         $this->assertTrue(isset($result->details));
@@ -64,7 +64,7 @@ class FunctionalTest extends TestCase
 
     public function testBlzServiceWithClassmapReturnsExpectedType()
     {
-        $this->client = new Client(new Browser($this->loop), self::$wsdl, array(
+        $this->client = new Client(null, self::$wsdl, array(
             'classmap' => array(
                 'getBankResponseType' => 'Clue\Tests\React\Soap\BankResponse'
             )
@@ -77,7 +77,7 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
-        $result = Block\await($promise, $this->loop);
+        $result = Block\await($promise, Loop::get());
 
         $this->assertInstanceOf('Clue\Tests\React\Soap\BankResponse', $result);
         $this->assertTrue(isset($result->details));
@@ -86,7 +86,7 @@ class FunctionalTest extends TestCase
 
     public function testBlzServiceWithSoapV12()
     {
-        $this->client = new Client(new Browser($this->loop), self::$wsdl, array(
+        $this->client = new Client(null, self::$wsdl, array(
             'soap_version' => SOAP_1_2
         ));
 
@@ -97,7 +97,7 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
-        $result = Block\await($promise, $this->loop);
+        $result = Block\await($promise, Loop::get());
 
         $this->assertIsObject($result);
         $this->assertTrue(isset($result->details));
@@ -106,7 +106,7 @@ class FunctionalTest extends TestCase
 
     public function testBlzServiceNonWsdlModeReturnedWithoutOuterResultStructure()
     {
-        $this->client = new Client(new Browser($this->loop), null, array(
+        $this->client = new Client(null, null, array(
             'location' => 'http://www.thomas-bayer.com/axis2/services/BLZService',
             'uri' => 'http://thomas-bayer.com/blz/',
         ));
@@ -117,7 +117,7 @@ class FunctionalTest extends TestCase
         // $promise = $api->getBank(new SoapParam('12070000', 'ns1:blz'));
         $promise = $api->getBank(new \SoapVar('12070000', XSD_STRING, null, null, 'blz', 'http://thomas-bayer.com/blz/'));
 
-        $result = Block\await($promise, $this->loop);
+        $result = Block\await($promise, Loop::get());
 
         $this->assertIsObject($result);
         $this->assertFalse(isset($result->details));
@@ -126,7 +126,7 @@ class FunctionalTest extends TestCase
 
     public function testBlzServiceWithRedirectLocationRejectsWithRuntimeException()
     {
-        $this->client = new Client(new Browser($this->loop), null, array(
+        $this->client = new Client(null, null, array(
             'location' => 'http://httpbingo.org/redirect-to?url=' . rawurlencode('http://www.thomas-bayer.com/axis2/services/BLZService'),
             'uri' => 'http://thomas-bayer.com/blz/',
         ));
@@ -136,7 +136,7 @@ class FunctionalTest extends TestCase
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('redirects');
-        Block\await($promise, $this->loop);
+        Block\await($promise, Loop::get());
     }
 
     public function testBlzServiceWithInvalidBlzRejectsWithSoapFault()
@@ -147,7 +147,7 @@ class FunctionalTest extends TestCase
 
         $this->expectException(\SoapFault::class);
         $this->expectExceptionMessage('Keine Bank zur BLZ invalid gefunden!');
-        Block\await($promise, $this->loop);
+        Block\await($promise, Loop::get());
     }
 
     public function testBlzServiceWithInvalidMethodRejectsWithSoapFault()
@@ -158,7 +158,7 @@ class FunctionalTest extends TestCase
 
         $this->expectException(\SoapFault::class);
         $this->expectExceptionMessage('Function ("doesNotExist") is not a valid method for this service');
-        Block\await($promise, $this->loop);
+        Block\await($promise, Loop::get());
     }
 
     public function testCancelMethodRejectsWithRuntimeException()
@@ -170,12 +170,12 @@ class FunctionalTest extends TestCase
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('cancelled');
-        Block\await($promise, $this->loop);
+        Block\await($promise, Loop::get());
     }
 
     public function testTimeoutRejectsWithRuntimeException()
     {
-        $browser = new Browser($this->loop);
+        $browser = new Browser();
         $browser = $browser->withTimeout(0);
 
         $this->client = new Client($browser, self::$wsdl);
@@ -185,7 +185,7 @@ class FunctionalTest extends TestCase
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('timed out');
-        Block\await($promise, $this->loop);
+        Block\await($promise, Loop::get());
     }
 
     public function testGetLocationForFunctionName()
@@ -213,7 +213,7 @@ class FunctionalTest extends TestCase
 
     public function testGetLocationWithExplicitLocationOptionReturnsAsIs()
     {
-        $this->client = new Client(new Browser($this->loop), self::$wsdl, array(
+        $this->client = new Client(null, self::$wsdl, array(
             'location' => 'http://example.com/'
         ));
 
@@ -236,7 +236,7 @@ class FunctionalTest extends TestCase
         $promise = $api->getBank(array('blz' => '12070000'));
 
         $this->expectException(\RuntimeException::class);
-        Block\await($promise, $this->loop);
+        Block\await($promise, Loop::get());
     }
 
     public function testWithLocationRestoredToOriginalResolves()
@@ -248,7 +248,7 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
-        $result = Block\await($promise, $this->loop);
+        $result = Block\await($promise, Loop::get());
         $this->assertIsObject($result);
     }
 }

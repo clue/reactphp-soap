@@ -2,11 +2,9 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$browser = new React\Http\Browser();
-
 $blz = isset($argv[1]) ? $argv[1] : '12070000';
 
-$client = new Clue\React\Soap\Client($browser, null, array(
+$client = new Clue\React\Soap\Client(null, null, array(
     'location' => 'http://www.thomas-bayer.com/axis2/services/BLZService',
     'uri' => 'http://thomas-bayer.com/blz/',
     'use' => SOAP_LITERAL

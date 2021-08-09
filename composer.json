@@ -18,7 +18,7 @@
     },
     "require": {
         "php": ">=7.1",
-        "react/http": "^1.0",
+        "react/http": "^1.5",
         "react/promise": "^2.1 || ^1.2",
         "ext-soap": "*"
     },
