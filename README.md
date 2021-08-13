@@ -67,8 +67,11 @@ Once [installed](#install), you can use the following code to query an example
 web service via SOAP:
 
 ```php
-$loop = React\EventLoop\Factory::create();
-$browser = new React\Http\Browser($loop);
+<?php
+
+require __DIR__ . '/vendor/autoload.php';
+
+$browser = new React\Http\Browser();
 $wsdl = 'http://example.com/demo.wsdl';
 
 $browser->get($wsdl)->then(function (Psr\Http\Message\ResponseInterface $response) use ($browser) {
@@ -79,8 +82,6 @@ $browser->get($wsdl)->then(function (Psr\Http\Message\ResponseInterface $respons
         var_dump('Result', $result);
     });
 });
-
-$loop->run();
 ```
 
 See also the [examples](examples).
@@ -90,30 +91,26 @@ See also the [examples](examples).
 ### Client
 
 The `Client` class is responsible for communication with the remote SOAP
-WebService server.
-
-It requires a [`Browser`](https://github.com/reactphp/http#browser) object
-bound to the main [`EventLoop`](https://github.com/reactphp/event-loop#usage)
-in order to handle async requests, the WSDL file contents and an optional
+WebService server. It requires the WSDL file contents and an optional
 array of SOAP options:
 
 ```php
-$loop = React\EventLoop\Factory::create();
-$browser = new React\Http\Browser($loop);
-
 $wsdl = '<?xml …';
 $options = array();
 
-$client = new Clue\React\Soap\Client($browser, $wsdl, $options);
+$client = new Clue\React\Soap\Client(null, $wsdl, $options);
 ```
 
+This class takes an optional `Browser|null $browser` parameter that can be used to
+pass the browser instance to use for this object.
 If you need custom connector settings (DNS resolution, TLS parameters, timeouts,
 proxy servers etc.), you can explicitly pass a custom instance of the
 [`ConnectorInterface`](https://github.com/reactphp/socket#connectorinterface)
-to the [`Browser`](https://github.com/reactphp/http#browser) instance:
+to the [`Browser`](https://github.com/reactphp/http#browser) instance
+and pass it as an additional argument to the `Client` like this:
 
 ```php
-$connector = new React\Socket\Connector($loop, array(
+$connector = new React\Socket\Connector(array(
     'dns' => '127.0.0.1',
     'tcp' => array(
         'bindto' => '192.168.10.1:0'
@@ -124,7 +121,7 @@ $connector = new React\Socket\Connector($loop, array(
     )
 ));
 
-$browser = new React\Http\Browser($loop, $connector);
+$browser = new React\Http\Browser($connector);
 $client = new Clue\React\Soap\Client($browser, $wsdl);
 ```
 
@@ -134,7 +131,7 @@ you to use local WSDL files, WSDL files from a cache or the most common form,
 downloading the WSDL file contents from an URL through the `Browser`:
 
 ```php
-$browser = new React\Http\Browser($loop);
+$browser = new React\Http\Browser();
 
 $browser->get($url)->then(
     function (Psr\Http\Message\ResponseInterface $response) use ($browser) {
@@ -155,7 +152,7 @@ parsed, this will throw a `SoapFault`:
 
 ```php
 try {
-    $client = new Clue\React\Soap\Client($browser, $wsdl);
+    $client = new Clue\React\Soap\Client(null, $wsdl);
 } catch (SoapFault $e) {
     echo 'Error: ' . $e->getMessage() . PHP_EOL;
 }
@@ -179,7 +176,7 @@ the URL of the SOAP server to send the request to, and `uri` is the target
 namespace of the SOAP service:
 
 ```php
-$client = new Clue\React\Soap\Client($browser, null, array(
+$client = new Clue\React\Soap\Client(null, null, array(
     'location' => 'http://example.com',
     'uri' => 'http://ping.example.com',
 ));
@@ -189,7 +186,7 @@ Similarly, if working in WSDL mode, the `location` option can be used to
 explicitly overwrite the URL of the SOAP server to send the request to:
 
 ```php
-$client = new Clue\React\Soap\Client($browser, $wsdl, array(
+$client = new Clue\React\Soap\Client(null, $wsdl, array(
     'location' => 'http://example.com'
 ));
 ```
@@ -198,7 +195,7 @@ You can use the `soap_version` option to change from the default SOAP 1.1 to
 use SOAP 1.2 instead:
 
 ```php
-$client = new Clue\React\Soap\Client($browser, $wsdl, array(
+$client = new Clue\React\Soap\Client(null, $wsdl, array(
     'soap_version' => SOAP_1_2
 ));
 ```
@@ -207,7 +204,7 @@ You can use the `classmap` option to map certain WSDL types to PHP classes
 like this:
 
 ```php
-$client = new Clue\React\Soap\Client($browser, $wsdl, array(
+$client = new Clue\React\Soap\Client(null, $wsdl, array(
     'classmap' => array(
         'getBankResponseType' => BankResponse::class
     )
@@ -366,7 +363,7 @@ clean up any underlying resources.
 ```php
 $promise = $proxy->demo();
 
-$loop->addTimer(2.0, function () use ($promise) {
+Loop::addTimer(2.0, function () use ($promise) {
     $promise->cancel();
 });
 ```
@@ -389,7 +386,7 @@ pass the timeout to the [underlying `Browser`](https://github.com/reactphp/http#
 like this:
 
 ```php
-$browser = new React\Http\Browser($loop);
+$browser = new React\Http\Browser();
 $browser = $browser->withTimeout(10.0);
 
 $client = new Clue\React\Soap\Client($browser, $wsdl);
