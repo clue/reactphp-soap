@@ -322,4 +322,19 @@ class Client
 
         return $client;
     }
+    
+    /**
+     * Returns a new `Client` with the given headers for all functions.
+     *
+     * @param array $headers
+     * @return self
+     */
+    public function withHeaders(array $headers): self
+    {
+        $client = clone $this;
+        $client->encoder = clone $this->encoder;
+        $client->encoder->__setSoapHeaders($headers);
+
+        return $client;
+    }
 }
