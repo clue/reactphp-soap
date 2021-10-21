@@ -42,6 +42,7 @@ This project provides a *simple* API for invoking *async* RPCs to remote web ser
     * [getTypes()](#gettypes)
     * [getLocation()](#getlocation)
     * [withLocation()](#withlocation)
+    * [withHeaders()](#withheaders)
   * [Proxy](#proxy)
     * [Functions](#functions)
     * [Promises](#promises)
@@ -306,6 +307,17 @@ assert('http://example.com/soap' === $client->getLocation('echo'));
 
 As an alternative to this method, you can also set the `location` option
 in the `Client` constructor (such as when in non-WSDL mode).
+
+#### withHeaders()
+
+The `withHeaders(array $headers): self` method can be used to
+return a new `Client` with the updated headers for all functions.
+This allows to set specific headers required by some SOAP endpoints, like
+for authentication, etc.
+
+```php
+$client = $client->withHeaders([new SoapHeader(...)]);
+```
 
 ### Proxy
 

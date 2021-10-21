@@ -59,4 +59,29 @@ class ClientTest extends TestCase
 
         $client->soapCall('ping', array());
     }
+
+    public function testWithHeaderProperlySetsHeadersInRequestBody()
+    {
+        $browser = $this->getMockBuilder('React\Http\Browser')->disableOriginalConstructor()->getMock();
+        $browser->expects($this->once())->method('withRejectErrorResponse')->willReturnSelf();
+        $browser->expects($this->once())->method('withFollowRedirects')->willReturnSelf();
+        $browser->expects($this->once())->method('request')->with('POST', 'http://example.com')
+            ->willReturnCallback(function ($method, $url, $headers, $body) {
+                // We expect the SOAP header to be present on the request body
+                $this->assertStringContainsString(
+                    '<SOAP-ENV:Header><ns2:echoMeStringRequest>hello world</ns2:echoMeStringRequest></SOAP-ENV:Header>',
+                    $body
+                );
+                return new Promise(function () { });
+            });
+
+        $client = new Client($browser, null, ['location' => 'http://example.com', 'uri' => 'http://example.com/uri']);
+        $client = $client->withHeaders([new \SoapHeader(
+            'http://soapinterop.org/echoheader/',
+            'echoMeStringRequest',
+            'hello world'
+        )]);
+
+        $client->soapCall('ping', []);
+    }
 }
