@@ -10,6 +10,10 @@ use RingCentral\Psr7\Request;
  */
 final class ClientEncoder extends \SoapClient
 {
+    private const CDATA_REGEX = '/<!\[CDATA\[(.*?)\]\]>/';
+    private const CDATA_OPEN  = '<![CDATA[';
+    private const CDATA_END   = ']]>';
+
     private $request = null;
 
     /**
@@ -56,6 +60,8 @@ final class ClientEncoder extends \SoapClient
             );
         }
 
+        $request = $this->parseCdata($request);
+
         $this->request = new Request(
             'POST',
             (string)$location,
@@ -65,5 +71,14 @@ final class ClientEncoder extends \SoapClient
 
         // do not actually block here, just pretend we're done...
         return '';
+    }
+
+    private function parseCdata($request)
+    {
+        $request = str_replace(['&lt;![CDATA[', ']]&gt;'], [self::CDATA_OPEN, self::CDATA_END], $request);
+
+        return preg_replace_callback(self::CDATA_REGEX, static function ($matches) {
+            return self::CDATA_OPEN . html_entity_decode($matches[1], ENT_XML1) . self::CDATA_END;
+        }, $request);
     }
 }
