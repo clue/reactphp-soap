@@ -11,30 +11,26 @@ use React\Promise\PromiseInterface;
 
 /**
  * The `Client` class is responsible for communication with the remote SOAP
- * WebService server.
- *
- * It requires a [`Browser`](https://github.com/reactphp/http#browser) object
- * bound to the main [`EventLoop`](https://github.com/reactphp/event-loop#usage)
- * in order to handle async requests, the WSDL file contents and an optional
+ * WebService server. It requires the WSDL file contents and an optional
  * array of SOAP options:
  *
  * ```php
- * $loop = React\EventLoop\Factory::create();
- * $browser = new React\Http\Browser($loop);
- *
  * $wsdl = '<?xml …';
  * $options = array();
  *
- * $client = new Clue\React\Soap\Client($browser, $wsdl, $options);
+ * $client = new Clue\React\Soap\Client(null, $wsdl, $options);
  * ```
  *
+ * This class takes an optional `Browser|null $browser` parameter that can be used to
+ * pass the browser instance to use for this object.
  * If you need custom connector settings (DNS resolution, TLS parameters, timeouts,
  * proxy servers etc.), you can explicitly pass a custom instance of the
  * [`ConnectorInterface`](https://github.com/reactphp/socket#connectorinterface)
- * to the [`Browser`](https://github.com/clue/reactphp/http#browser) instance:
+ * to the [`Browser`](https://github.com/reactphp/http#browser) instance
+ * and pass it as an additional argument to the `Client` like this:
  *
  * ```php
- * $connector = new React\Socket\Connector($loop, array(
+ * $connector = new React\Socket\Connector(array(
  *     'dns' => '127.0.0.1',
  *     'tcp' => array(
  *         'bindto' => '192.168.10.1:0'
@@ -45,7 +41,7 @@ use React\Promise\PromiseInterface;
  *     )
  * ));
  *
- * $browser = new React\Http\Browser($loop, $connector);
+ * $browser = new React\Http\Browser($connector);
  * $client = new Clue\React\Soap\Client($browser, $wsdl);
  * ```
  *
@@ -55,7 +51,7 @@ use React\Promise\PromiseInterface;
  * downloading the WSDL file contents from an URL through the `Browser`:
  *
  * ```php
- * $browser = new React\Http\Browser($loop);
+ * $browser = new React\Http\Browser();
  *
  * $browser->get($url)->then(
  *     function (Psr\Http\Message\ResponseInterface $response) use ($browser) {
@@ -76,7 +72,7 @@ use React\Promise\PromiseInterface;
  *
  * ```php
  * try {
- *     $client = new Clue\React\Soap\Client($browser, $wsdl);
+ *     $client = new Clue\React\Soap\Client(null, $wsdl);
  * } catch (SoapFault $e) {
  *     echo 'Error: ' . $e->getMessage() . PHP_EOL;
  * }
@@ -100,7 +96,7 @@ use React\Promise\PromiseInterface;
  * namespace of the SOAP service:
  *
  * ```php
- * $client = new Clue\React\Soap\Client($browser, null, array(
+ * $client = new Clue\React\Soap\Client(null, null, array(
  *     'location' => 'http://example.com',
  *     'uri' => 'http://ping.example.com',
  * ));
@@ -110,7 +106,7 @@ use React\Promise\PromiseInterface;
  * explicitly overwrite the URL of the SOAP server to send the request to:
  *
  * ```php
- * $client = new Clue\React\Soap\Client($browser, $wsdl, array(
+ * $client = new Clue\React\Soap\Client(null, $wsdl, array(
  *     'location' => 'http://example.com'
  * ));
  * ```
@@ -119,7 +115,7 @@ use React\Promise\PromiseInterface;
  * use SOAP 1.2 instead:
  *
  * ```php
- * $client = new Clue\React\Soap\Client($browser, $wsdl, array(
+ * $client = new Clue\React\Soap\Client(null, $wsdl, array(
  *     'soap_version' => SOAP_1_2
  * ));
  * ```
@@ -128,7 +124,7 @@ use React\Promise\PromiseInterface;
  * like this:
  *
  * ```php
- * $client = new Clue\React\Soap\Client($browser, $wsdl, array(
+ * $client = new Clue\React\Soap\Client(null, $wsdl, array(
  *     'classmap' => array(
  *         'getBankResponseType' => BankResponse::class
  *     )
@@ -146,29 +142,32 @@ use React\Promise\PromiseInterface;
  */
 class Client
 {
+    /** @var Browser */
     private $browser;
+
     private $encoder;
     private $decoder;
 
     /**
      * Instantiate a new SOAP client for the given WSDL contents.
      *
-     * @param Browser     $browser
-     * @param string|null $wsdlContents
-     * @param array       $options
+     * @param ?Browser $browser
+     * @param ?string  $wsdlContents
+     * @param ?array   $options
      */
-    public function __construct(Browser $browser, ?string $wsdlContents, array $options = array())
+    public function __construct(?Browser $browser, ?string $wsdlContents, array $options = array())
     {
         $wsdl = $wsdlContents !== null ? 'data://text/plain;base64,' . base64_encode($wsdlContents) : null;
+
+        $this->browser = $browser ?? new Browser();
 
         // Accept HTTP responses with error status codes as valid responses.
         // This is done in order to process these error responses through the normal SOAP decoder.
         // Additionally, we explicitly limit number of redirects to zero because following redirects makes little sense
         // because it transforms the POST request to a GET one and hence loses the SOAP request body.
-        $browser = $browser->withRejectErrorResponse(false);
-        $browser = $browser->withFollowRedirects(0);
+        $this->browser = $this->browser->withRejectErrorResponse(false);
+        $this->browser = $this->browser->withFollowRedirects(0);
 
-        $this->browser = $browser;
         $this->encoder = new ClientEncoder($wsdl, $options);
         $this->decoder = new ClientDecoder($wsdl, $options);
     }
@@ -341,6 +340,21 @@ class Client
         $client = clone $this;
         $client->encoder = clone $this->encoder;
         $client->encoder->__setLocation($location);
+
+        return $client;
+    }
+    
+    /**
+     * Returns a new `Client` with the given headers for all functions.
+     *
+     * @param array $headers
+     * @return self
+     */
+    public function withHeaders(array $headers): self
+    {
+        $client = clone $this;
+        $client->encoder = clone $this->encoder;
+        $client->encoder->__setSoapHeaders($headers);
 
         return $client;
     }

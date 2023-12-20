@@ -2,8 +2,7 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$loop = React\EventLoop\Factory::create();
-$browser = new React\Http\Browser($loop);
+$browser = new React\Http\Browser();
 
 $wsdl = isset($argv[1]) ? $argv[1] : 'http://www.thomas-bayer.com/axis2/services/BLZService?wsdl';
 
@@ -21,5 +20,3 @@ $browser->get($wsdl)->done(
         echo 'Error: ' . $e->getMessage() . PHP_EOL;
     }
 );
-
-$loop->run();
