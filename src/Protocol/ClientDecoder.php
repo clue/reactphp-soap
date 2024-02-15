@@ -42,7 +42,7 @@ final class ClientDecoder extends \SoapClient
      *
      * @see \SoapClient::__doRequest()
      */
-    public function __doRequest($request, $location, $action, $version, $one_way = 0)
+    public function __doRequest(string $request, string $location, string $action, int $version, bool $one_way = false): ?string
     {
         // the actual result doesn't actually matter, just return the given result
         // this will be processed internally and will return the parsed result
