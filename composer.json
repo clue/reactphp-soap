@@ -18,12 +18,13 @@
     },
     "require": {
         "php": ">=7.1",
-        "react/http": "^1.5",
-        "react/promise": "^2.1 || ^1.2",
+        "react/http": "^1.11",
+        "react/promise": "^3.2 || ^2.1 || ^1.2",
+        "laminas/laminas-diactoros": "^3.5 || ^2.4",
         "ext-soap": "*"
     },
     "require-dev": {
-        "clue/block-react": "^1.0",
-        "phpunit/phpunit": "^9.3 || ^7.5"
+        "react/async": "^4.3 || ^3.2",
+        "phpunit/phpunit": "^9.6 || ^7.5"
     }
 }

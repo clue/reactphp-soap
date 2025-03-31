@@ -2,12 +2,12 @@
 
 namespace Clue\Tests\React\Soap;
 
-use Clue\React\Block;
+use React\Async;
+use React\Http\Browser;
 use Clue\React\Soap\Client;
 use Clue\React\Soap\Proxy;
 use PHPUnit\Framework\TestCase;
-use React\EventLoop\Loop;
-use React\Http\Browser;
+
 
 class BankResponse
 {
@@ -55,7 +55,7 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
-        $result = Block\await($promise, Loop::get());
+        $result = Async\await($promise);
 
         $this->assertIsObject($result);
         $this->assertTrue(isset($result->details));
@@ -77,7 +77,7 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
-        $result = Block\await($promise, Loop::get());
+        $result = Async\await($promise);
 
         $this->assertInstanceOf('Clue\Tests\React\Soap\BankResponse', $result);
         $this->assertTrue(isset($result->details));
@@ -97,7 +97,7 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
-        $result = Block\await($promise, Loop::get());
+        $result = Async\await($promise);
 
         $this->assertIsObject($result);
         $this->assertTrue(isset($result->details));
@@ -117,7 +117,7 @@ class FunctionalTest extends TestCase
         // $promise = $api->getBank(new SoapParam('12070000', 'ns1:blz'));
         $promise = $api->getBank(new \SoapVar('12070000', XSD_STRING, null, null, 'blz', 'http://thomas-bayer.com/blz/'));
 
-        $result = Block\await($promise, Loop::get());
+        $result = Async\await($promise);
 
         $this->assertIsObject($result);
         $this->assertFalse(isset($result->details));
@@ -158,7 +158,7 @@ class FunctionalTest extends TestCase
 
         $this->expectException(\SoapFault::class);
         $this->expectExceptionMessage('Function ("doesNotExist") is not a valid method for this service');
-        Block\await($promise, Loop::get());
+        Async\await($promise);
     }
 
     public function testCancelMethodRejectsWithRuntimeException()
@@ -170,7 +170,7 @@ class FunctionalTest extends TestCase
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('cancelled');
-        Block\await($promise, Loop::get());
+        Async\await($promise);
     }
 
     public function testTimeoutRejectsWithRuntimeException()
@@ -185,7 +185,7 @@ class FunctionalTest extends TestCase
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('timed out');
-        Block\await($promise, Loop::get());
+        Async\await($promise);
     }
 
     public function testGetLocationForFunctionName()
@@ -236,7 +236,7 @@ class FunctionalTest extends TestCase
         $promise = $api->getBank(array('blz' => '12070000'));
 
         $this->expectException(\RuntimeException::class);
-        Block\await($promise, Loop::get());
+        Async\await($promise);
     }
 
     public function testWithLocationRestoredToOriginalResolves()
@@ -248,7 +248,7 @@ class FunctionalTest extends TestCase
 
         $promise = $api->getBank(array('blz' => '12070000'));
 
-        $result = Block\await($promise, Loop::get());
+        $result = Async\await($promise);
         $this->assertIsObject($result);
     }
 }

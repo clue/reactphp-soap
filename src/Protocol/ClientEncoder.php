@@ -3,7 +3,8 @@
 namespace Clue\React\Soap\Protocol;
 
 use Psr\Http\Message\RequestInterface;
-use RingCentral\Psr7\Request;
+use Laminas\Diactoros\Request;
+use Laminas\Diactoros\StreamFactory;
 
 /**
  * @internal
@@ -56,11 +57,13 @@ final class ClientEncoder extends \SoapClient
             );
         }
 
+        $body = (new StreamFactory())->createStream((string)$request);
+
         $this->request = new Request(
-            'POST',
             (string)$location,
-            $headers,
-            (string)$request
+            'POST',
+            $body,
+            $headers
         );
 
         // do not actually block here, just pretend we're done...
