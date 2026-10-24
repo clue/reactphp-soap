@@ -3,7 +3,7 @@
 namespace Clue\React\Soap\Protocol;
 
 use Psr\Http\Message\RequestInterface;
-use RingCentral\Psr7\Request;
+use React\Http\Message\Request;
 
 /**
  * @internal
