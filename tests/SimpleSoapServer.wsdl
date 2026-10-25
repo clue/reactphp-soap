@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="SimpleSoapServer"
+    targetNamespace="SimpleSoapServer"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+    xmlns:tns="SimpleSoapServer"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <types>
+        <schema targetNamespace="SimpleSoapServer"
+                xmlns="http://www.w3.org/2001/XMLSchema">
+            <element name="Add">
+                <complexType>
+                    <sequence>
+                        <element name="x" type="xsd:int"/>
+                        <element name="y" type="xsd:int"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="AddResponse">
+                <complexType>
+                    <sequence>
+                        <element name="additionResult" type="xsd:int"/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+    </types>
+
+    <message name="AddRequest">
+        <part name="parameters" element="tns:Add"/>
+    </message>
+
+    <message name="AddResponse">
+        <part name="parameters" element="tns:AddResponse"/>
+    </message>
+
+    <portType name="SimpleSoapServerPortType">
+        <operation name="add">
+            <input message="tns:AddRequest"/>
+            <output message="tns:AddResponse"/>
+        </operation>
+    </portType>
+
+    <binding name="SimpleSoapServerBinding" type="tns:SimpleSoapServerPortType">
+        <soap12:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="add">
+            <soap12:operation soapAction="http://localhost:8000/SimpleSoapServer.php#add"/>
+            <input>
+                <soap12:body use="literal" namespace="SimpleSoapServer"/>
+            </input>
+            <output>
+                <soap12:body use="literal" namespace="SimpleSoapServer"/>
+            </output>
+        </operation>
+    </binding>
+
+    <service name="SimpleSoapServer">
+        <port name="SimpleSoapServerPort" binding="tns:SimpleSoapServerBinding">
+            <soap12:address location="http://localhost:8000/SimpleSoapServer.php"/>
+        </port>
+    </service>
+
+</definitions>

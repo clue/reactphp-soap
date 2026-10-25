@@ -9,8 +9,9 @@ use PHPUnit\Framework\TestCase;
 use React\EventLoop\Loop;
 use React\Http\Browser;
 
-class BankResponse
+class AddResponse
 {
+    public readonly int $additionResult;
 }
 
 /**
@@ -28,14 +29,37 @@ class FunctionalTest extends TestCase
      */
     private $client;
 
+    // set up server once for all test cases
+    private static $serverProcess;
+
     // download WSDL file only once for all test cases
     private static $wsdl;
+
+    /**
+     * @beforeClass
+     */
+    public static function setUpServerBeforeClass()
+    {
+        $listenAddress = '127.0.0.1:8000';
+        $serverRoot = __DIR__;
+        $serverStartCommand = sprintf('php -S %s -t %s >/dev/null 2>&1 &', $listenAddress, $serverRoot);
+        self::$serverProcess = \proc_open($serverStartCommand, [], $pipes);
+
+        // Briefly wait for the server to settle.
+        sleep(1);
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        proc_close(self::$serverProcess);
+    }
+
     /**
      * @beforeClass
      */
     public static function setUpFileBeforeClass()
     {
-        self::$wsdl = file_get_contents('http://www.thomas-bayer.com/axis2/services/BLZService?wsdl');
+        self::$wsdl = file_get_contents('http://localhost:8000/SimpleSoapServer.php?wsdl');
     }
 
     /**
@@ -46,111 +70,91 @@ class FunctionalTest extends TestCase
         $this->client = new Client(null, self::$wsdl);
     }
 
-    public function testBlzService()
+    public function testSoapService()
     {
-        $this->assertCount(2, $this->client->getFunctions());
-        $this->assertCount(3, $this->client->getTypes());
+        $this->assertCount(1, $this->client->getFunctions());
+        $this->assertCount(2, $this->client->getTypes());
 
         $api = new Proxy($this->client);
 
-        $promise = $api->getBank(array('blz' => '12070000'));
+        $promise = $api->add(['x' => 21, 'y' => 21]);
 
         $result = Block\await($promise, Loop::get());
 
         $this->assertIsObject($result);
-        $this->assertTrue(isset($result->details));
-        $this->assertTrue(isset($result->details->bic));
+        $this->assertEquals(42, $result->additionResult);
     }
 
-    public function testBlzServiceWithClassmapReturnsExpectedType()
+    public function testSoapServiceWithClassmapReturnsExpectedType()
     {
         $this->client = new Client(null, self::$wsdl, array(
             'classmap' => array(
-                'getBankResponseType' => 'Clue\Tests\React\Soap\BankResponse'
+                'AddResponse' => AddResponse::class
             )
         ));
 
-        $this->assertCount(2, $this->client->getFunctions());
-        $this->assertCount(3, $this->client->getTypes());
+        $this->assertCount(1, $this->client->getFunctions());
+        $this->assertCount(2, $this->client->getTypes());
 
         $api = new Proxy($this->client);
 
-        $promise = $api->getBank(array('blz' => '12070000'));
+        $promise = $api->add(['x' => 21, 'y' => 21]);
 
         $result = Block\await($promise, Loop::get());
 
-        $this->assertInstanceOf('Clue\Tests\React\Soap\BankResponse', $result);
-        $this->assertTrue(isset($result->details));
-        $this->assertTrue(isset($result->details->bic));
+        $this->assertInstanceOf(AddResponse::class, $result);
+        $this->assertEquals(42, $result->additionResult);
     }
 
-    public function testBlzServiceWithSoapV12()
+    public function testSoapServiceWithSoapV12()
     {
         $this->client = new Client(null, self::$wsdl, array(
             'soap_version' => SOAP_1_2
         ));
 
-        $this->assertCount(2, $this->client->getFunctions());
-        $this->assertCount(3, $this->client->getTypes());
+        $this->assertCount(1, $this->client->getFunctions());
+        $this->assertCount(2, $this->client->getTypes());
 
         $api = new Proxy($this->client);
 
-        $promise = $api->getBank(array('blz' => '12070000'));
+        $promise = $api->add(['x' => 21, 'y' => 21]);
 
         $result = Block\await($promise, Loop::get());
 
         $this->assertIsObject($result);
-        $this->assertTrue(isset($result->details));
-        $this->assertTrue(isset($result->details->bic));
+        $this->assertEquals(42, $result->additionResult);
     }
 
-    public function testBlzServiceNonWsdlModeReturnedWithoutOuterResultStructure()
+    public function testSoapServiceNonWsdlMode()
     {
         $this->client = new Client(null, null, array(
-            'location' => 'http://www.thomas-bayer.com/axis2/services/BLZService',
-            'uri' => 'http://thomas-bayer.com/blz/',
+            'location' => 'http://localhost:8000/SimpleSoapServer.php',
+            'uri' => 'http://localhost:8000/SimpleSoapServer.php'
         ));
 
         $api = new Proxy($this->client);
-
-        // try encoding the "blz" parameter with the correct namespace (see uri)
-        // $promise = $api->getBank(new SoapParam('12070000', 'ns1:blz'));
-        $promise = $api->getBank(new \SoapVar('12070000', XSD_STRING, null, null, 'blz', 'http://thomas-bayer.com/blz/'));
+        
+        $promise = $api->add((object)['x' => 21, 'y' => 21]);
 
         $result = Block\await($promise, Loop::get());
 
-        $this->assertIsObject($result);
-        $this->assertFalse(isset($result->details));
-        $this->assertTrue(isset($result->bic));
+        $this->assertEquals(42, $result->additionResult);
     }
-
-    public function testBlzServiceWithRedirectLocationRejectsWithRuntimeException()
+    public function testSoapServiceWithRedirectLocationRejectsWithRuntimeException()
     {
         $this->client = new Client(null, null, array(
-            'location' => 'http://httpbingo.org/redirect-to?url=' . rawurlencode('http://www.thomas-bayer.com/axis2/services/BLZService'),
-            'uri' => 'http://thomas-bayer.com/blz/',
+            'location' => 'http://httpbin.org/redirect-to?url=' . rawurlencode('http://localhost:8000/SimpleSoapServer.php/'),
+            'uri' => 'http://localhost:8000/SimpleSoapServer.php/',
         ));
 
         $api = new Proxy($this->client);
-        $promise = $api->getBank('a');
+        $promise = $api->add(['x' => 21, 'y' => 21]);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('redirects');
-        Block\await($promise, Loop::get());
+        Async\await($promise);
     }
-
-    public function testBlzServiceWithInvalidBlzRejectsWithSoapFault()
-    {
-        $api = new Proxy($this->client);
-
-        $promise = $api->getBank(array('blz' => 'invalid'));
-
-        $this->expectException(\SoapFault::class);
-        $this->expectExceptionMessage('Keine Bank zur BLZ invalid gefunden!');
-        Block\await($promise, Loop::get());
-    }
-
-    public function testBlzServiceWithInvalidMethodRejectsWithSoapFault()
+    public function testSoapServiceWithInvalidMethodRejectsWithSoapFault()
     {
         $api = new Proxy($this->client);
 
@@ -165,7 +169,7 @@ class FunctionalTest extends TestCase
     {
         $api = new Proxy($this->client);
 
-        $promise = $api->getBank(array('blz' => '12070000'));
+        $promise = $api->add(['x' => 21, 'y' => 21]);
         $promise->cancel();
 
         $this->expectException(\RuntimeException::class);
@@ -181,7 +185,7 @@ class FunctionalTest extends TestCase
         $this->client = new Client($browser, self::$wsdl);
         $api = new Proxy($this->client);
 
-        $promise = $api->getBank(array('blz' => '12070000'));
+        $promise = $api->add(['x' => 21, 'y' => 21]);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('timed out');
@@ -190,13 +194,13 @@ class FunctionalTest extends TestCase
 
     public function testGetLocationForFunctionName()
     {
-        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation('getBank'));
-        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation('getBank'));
+        $this->assertEquals('http://localhost:8000/SimpleSoapServer.php', $this->client->getLocation('add'));
+        $this->assertEquals('http://localhost:8000/SimpleSoapServer.php', $this->client->getLocation('add'));
     }
 
     public function testGetLocationForFunctionNumber()
     {
-        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation(0));
+        $this->assertEquals('http://localhost:8000/SimpleSoapServer.php', $this->client->getLocation(0));
     }
 
     public function testGetLocationOfUnknownFunctionNameFails()
@@ -208,7 +212,7 @@ class FunctionalTest extends TestCase
     public function testGetLocationForUnknownFunctionNumberFails()
     {
         $this->expectException(\SoapFault::class);
-        $this->assertEquals('http://www.thomas-bayer.com/axis2/services/BLZService', $this->client->getLocation(100));
+        $this->assertEquals('http://localhost:8000/SimpleSoapServer.php', $this->client->getLocation(100));
     }
 
     public function testGetLocationWithExplicitLocationOptionReturnsAsIs()
@@ -233,7 +237,7 @@ class FunctionalTest extends TestCase
     {
         $api = new Proxy($this->client->withLocation('http://nonsense.invalid'));
 
-        $promise = $api->getBank(array('blz' => '12070000'));
+        $promise = $api->add(['x' => 21, 'y' => 21]);
 
         $this->expectException(\RuntimeException::class);
         Block\await($promise, Loop::get());
@@ -246,9 +250,10 @@ class FunctionalTest extends TestCase
         $client = $client->withLocation($original);
         $api = new Proxy($client);
 
-        $promise = $api->getBank(array('blz' => '12070000'));
+        $promise = $api->add(['x' => 21, 'y' => 21]);
 
         $result = Block\await($promise, Loop::get());
         $this->assertIsObject($result);
+        $this->assertEquals(42, $result->additionResult);
     }
 }
