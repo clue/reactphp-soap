@@ -24,6 +24,7 @@
     },
     "require-dev": {
         "clue/block-react": "^1.0",
-        "phpunit/phpunit": "^9.3 || ^7.5"
+        "phpunit/phpunit": "^9.3 || ^7.5",
+        "ringcentral/psr7": "^1.2"
     }
 }
